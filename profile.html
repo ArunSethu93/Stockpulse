@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Dashboard — StockPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c10;--bg2:#0d1117;--bg3:#161b22;--bgc:#0f1923;--bgh:#1a2332;
+  --br:#1e2d3d;--bra:#2d4a6e;
+  --t1:#e8edf3;--t2:#8b9ab0;--t3:#4a5a6e;
+  --g:#00d68f;--gd:rgba(0,214,143,.08);--gb:rgba(0,214,143,.2);
+  --r:#ff4d6d;--rd:rgba(255,77,109,.08);--rb:rgba(255,77,109,.2);
+  --b:#3b82f6;--bd:rgba(59,130,246,.10);--bbr:rgba(59,130,246,.2);
+  --am:#f59e0b;--amd:rgba(245,158,11,.08);--amb:rgba(245,158,11,.2);
+  --cy:#06b6d4;--pu:#8b5cf6;
+  --fm:'IBM Plex Mono',monospace;--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --sw:220px;--th:40px;--nh:48px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:13px;line-height:1.5;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--br);border-radius:2px}
+
+/* ─── TICKER ─── */
+.tkbar{background:var(--bg2);border-bottom:1px solid var(--br);height:var(--th);overflow:hidden;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center}
+.tklbl{background:var(--b);color:#fff;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;padding:0 12px;height:100%;display:flex;align-items:center;flex-shrink:0}
+.tkscroll{display:flex;animation:tks 50s linear infinite}
+@keyframes tks{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tki{display:flex;align-items:center;gap:8px;padding:0 16px;border-right:1px solid var(--br);height:var(--th);white-space:nowrap;cursor:pointer;flex-shrink:0}
+.tksym{font-family:var(--fm);font-size:11px;font-weight:600}
+.tkprc{font-family:var(--fm);font-size:11px;color:var(--t2)}
+.tkchg{font-family:var(--fm);font-size:10px;font-weight:500;padding:1px 5px;border-radius:2px}
+.up{color:var(--g);background:var(--gd)}.down{color:var(--r);background:var(--rd)}
+
+/* ─── TOPNAV ─── */
+.nav{position:fixed;top:var(--th);left:0;right:0;height:var(--nh);background:var(--bg2);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 16px;gap:14px;z-index:99}
+.logo{font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--t1)}
+.ldot{width:8px;height:8px;background:var(--g);border-radius:50%;animation:pd 2s ease-in-out infinite}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.nr{margin-left:auto;display:flex;align-items:center;gap:8px}
+.ibtn{width:32px;height:32px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:13px;transition:all .15s;position:relative}
+.ibtn:hover{background:var(--bgh);color:var(--t1)}
+.notif-dot{position:absolute;top:5px;right:5px;width:5px;height:5px;background:var(--r);border-radius:50%}
+.signout-btn{font-size:12px;color:var(--t3);cursor:pointer;padding:6px 10px;border-radius:5px;transition:all .15s}
+.signout-btn:hover{color:var(--r);background:var(--rd)}
+
+/* ─── LAYOUT ─── */
+.wrap{display:flex;padding-top:calc(var(--th)+var(--nh))}
+.sidebar{width:var(--sw);background:var(--bg2);border-right:1px solid var(--br);position:fixed;top:calc(var(--th)+var(--nh));bottom:0;left:0;overflow-y:auto;z-index:50;padding:12px 0}
+.ssec{padding:0 8px;margin-bottom:18px}
+.slbl{font-family:var(--fm);font-size:9px;font-weight:600;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;padding:0 12px;margin-bottom:4px}
+.ni{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--t2);font-size:13px;transition:all .15s;border:1px solid transparent}
+.ni:hover{background:var(--bgh);color:var(--t1)}
+.ni.act{background:var(--bd);color:var(--b);border-color:var(--bbr)}
+.nico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;font-family:var(--fm);font-size:9px;padding:1px 5px;border-radius:8px;background:var(--r);color:#fff}
+.main{flex:1;margin-left:var(--sw);padding:20px;min-width:0;max-width:calc(100% - var(--sw))}
+
+/* ─── PROFILE HEADER ─── */
+.profile-hdr{background:var(--bg2);border:1px solid var(--br);border-radius:10px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.profile-hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--b),var(--pu),var(--g))}
+.ph-layout{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.ph-avatar-wrap{position:relative}
+.ph-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:24px;font-weight:600;color:#fff;border:3px solid var(--bra);flex-shrink:0}
+.ph-online{position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:var(--g);border:2px solid var(--bg2);border-radius:50%}
+.ph-info{flex:1;min-width:200px}
+.ph-name{font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:2px}
+.ph-username{font-family:var(--fm);font-size:12px;color:var(--t3);margin-bottom:6px}
+.ph-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ph-badge{font-family:var(--fm);font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px;border:1px solid}
+.ph-bio{font-size:12px;color:var(--t2);line-height:1.5}
+.ph-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--br);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-top:16px}
+.phs{background:var(--bgc);padding:12px 14px;text-align:center}
+.phs-val{font-family:var(--fm);font-size:18px;font-weight:600}
+.phs-lbl{font-size:10px;color:var(--t3);margin-top:2px}
+.edit-profile-btn{background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--t1);white-space:nowrap}
+.edit-profile-btn:hover{border-color:var(--bra);background:var(--bgh)}
+
+/* ─── DASHBOARD TABS ─── */
+.dash-tabs{display:flex;gap:0;border-bottom:1px solid var(--br);margin-bottom:20px;overflow-x:auto}
+.dtab{padding:10px 18px;font-size:12px;font-weight:500;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.dtab:hover{color:var(--t1)}
+.dtab.act{color:var(--b);border-bottom-color:var(--b)}
+
+/* ─── WATCHLIST ─── */
+.wl-controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.wl-search{flex:1;max-width:280px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:7px 12px 7px 30px;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none;transition:border-color .2s;position:relative}
+.wl-search:focus{border-color:var(--b)}
+.wl-search::placeholder{color:var(--t3)}
+.wl-sort{background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:6px 10px;color:var(--t1);font-family:var(--fm);font-size:11px;outline:none;cursor:pointer}
+.add-stock-btn{display:flex;align-items:center;gap:6px;background:var(--b);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;transition:opacity .15s;margin-left:auto}
+.add-stock-btn:hover{opacity:.85}
+
+.wl-table{background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.wl-thead{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 80px;padding:9px 16px;border-bottom:1px solid var(--br);background:var(--bg3)}
+.wl-th{font-family:var(--fm);font-size:9px;font-weight:600;letter-spacing:.08em;color:var(--t3);text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:4px;transition:color .15s}
+.wl-th:hover{color:var(--t2)}
+.wl-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 80px;padding:11px 16px;border-bottom:1px solid var(--br);align-items:center;cursor:pointer;transition:background .15s}
+.wl-row:last-child{border-bottom:none}
+.wl-row:hover{background:var(--bgh)}
+.wl-sym{font-family:var(--fm);font-size:12px;font-weight:600}
+.wl-name{font-size:10px;color:var(--t3);margin-top:1px}
+.wl-price{font-family:var(--fm);font-size:13px;font-weight:500}
+.wl-pct{font-family:var(--fm);font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px}
+.pct-up{color:var(--g);background:var(--gd)}.pct-dn{color:var(--r);background:var(--rd)}
+.wl-vol{font-family:var(--fm);font-size:11px;color:var(--t2)}
+.wl-actions{display:flex;gap:6px;justify-content:flex-end}
+.wla{width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--t3);transition:all .15s}
+.wla:hover{background:var(--bg3);color:var(--t1)}
+.wla.alert-set{color:var(--am)}
+
+/* ─── ALERTS ─── */
+.alerts-grid{display:grid;gap:10px;margin-bottom:16px}
+.alert-card{background:var(--bgc);border:1px solid var(--br);border-radius:8px;padding:16px;display:flex;align-items:flex-start;gap:14px;transition:all .2s}
+.alert-card:hover{border-color:var(--bra)}
+.alert-card.triggered{border-color:var(--amb);background:rgba(245,158,11,.03)}
+.ac-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ac-content{flex:1;min-width:0}
+.ac-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:3px}
+.ac-meta{font-family:var(--fm);font-size:10px;color:var(--t3);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ac-progress{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.ac-fill{height:100%;border-radius:2px;transition:width .5s}
+.ac-range{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;color:var(--t3)}
+.ac-actions{display:flex;gap:6px;align-items:center}
+.ac-toggle{width:36px;height:20px;background:var(--bg3);border:1px solid var(--br);border-radius:10px;cursor:pointer;position:relative;transition:all .2s;flex-shrink:0}
+.ac-toggle.on{background:var(--g);border-color:var(--g)}
+.ac-toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.ac-toggle.on::after{transform:translateX(16px)}
+.add-alert-btn{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:10px 16px;font-size:12px;cursor:pointer;color:var(--t2);transition:all .15s;width:100%;justify-content:center}
+.add-alert-btn:hover{border-color:var(--bra);color:var(--t1);background:var(--bgh)}
+
+/* ─── ALERT MODAL ─── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--bg2);border:1px solid var(--br);border-radius:12px;width:100%;max-width:460px;overflow:hidden}
+.modal-hdr{padding:18px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:var(--fd);font-size:15px;font-weight:700}
+.modal-close{width:28px;height:28px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:14px;transition:all .15s}
+.modal-close:hover{color:var(--t1)}
+.modal-body{padding:20px}
+.form-group{margin-bottom:16px}
+.form-label{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:7px;display:block}
+.form-input,.form-select{width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:9px 12px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;transition:border-color .2s}
+.form-input:focus,.form-select:focus{border-color:var(--b)}
+.form-select option{background:var(--bg2)}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--br);display:flex;gap:8px}
+.btn-primary{flex:2;background:var(--b);color:#fff;border:none;border-radius:6px;padding:10px;font-family:var(--fd);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{flex:1;background:transparent;border:1px solid var(--br);border-radius:6px;padding:10px;font-family:var(--fd);font-size:13px;color:var(--t2);cursor:pointer;transition:all .15s}
+.btn-secondary:hover{border-color:var(--bra);color:var(--t1)}
+
+/* ─── NOTIFICATIONS ─── */
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--br);cursor:pointer;transition:background .15s;position:relative}
+.notif-item:hover{background:var(--bgh)}
+.notif-item.unread{background:rgba(59,130,246,.03)}
+.notif-item.unread::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--b);border-radius:0 2px 2px 0}
+.ni-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ni-content{flex:1;min-width:0}
+.ni-title{font-size:13px;font-weight:500;color:var(--t1);line-height:1.4;margin-bottom:3px}
+.ni-meta{display:flex;gap:8px;font-family:var(--fm);font-size:10px;color:var(--t3)}
+.ni-actions{display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0}
+
+/* ─── ACTIVITY ─── */
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--br)}
+.activity-item:last-child{border-bottom:none}
+.act-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.act-text{font-size:12px;color:var(--t2);line-height:1.5;flex:1}
+.act-text strong{color:var(--t1);font-weight:500}
+.act-time{font-family:var(--fm);font-size:10px;color:var(--t3);white-space:nowrap}
+
+/* ─── SETTINGS ─── */
+.settings-section{background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.settings-hdr{padding:12px 16px;border-bottom:1px solid var(--br);font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--br)}
+.settings-row:last-child{border-bottom:none}
+.sr-label{font-size:13px;font-weight:500;margin-bottom:2px}
+.sr-sub{font-size:11px;color:var(--t3)}
+.toggle{width:40px;height:22px;background:var(--bg3);border:1px solid var(--br);border-radius:11px;cursor:pointer;position:relative;transition:all .2s;flex-shrink:0}
+.toggle.on{background:var(--b);border-color:var(--b)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.toggle.on::after{transform:translateX(18px)}
+
+/* ─── PORTFOLIO SUMMARY ─── */
+.pf-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pfs-card{background:var(--bgc);border:1px solid var(--br);border-radius:8px;padding:14px}
+.pfs-lbl{font-size:10px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm)}
+.pfs-val{font-family:var(--fm);font-size:20px;font-weight:600}
+.pfs-sub{font-size:11px;margin-top:3px}
+
+@media(max-width:800px){.sidebar{display:none}.main{margin-left:0;padding:12px}.ph-stats{grid-template-columns:repeat(2,1fr)}.pf-summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="tkbar">
+  <div class="tklbl">NSE LIVE</div>
+  <div style="overflow:hidden;flex:1"><div class="tkscroll" id="tk"></div></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="logo" href="index.html"><div class="ldot"></div>StockPulse</a>
+  <div style="display:flex;gap:6px;align-items:center;font-family:var(--fm);font-size:11px;color:var(--t3)">
+    <span id="navUser">Loading…</span>
+  </div>
+  <div class="nr">
+    <div class="ibtn" onclick="showTab('notifications')">🔔<div class="notif-dot" id="notifDot"></div></div>
+    <div class="ibtn" onclick="showTab('settings')">⚙</div>
+    <div class="signout-btn" onclick="signOut()">← Sign Out</div>
+  </div>
+</nav>
+
+<div class="wrap">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="ssec" style="padding:12px 8px 0">
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:13px;font-weight:600;color:#fff;border:2px solid var(--bra)" id="sideAvatar">SP</div>
+      <div><div style="font-size:13px;font-weight:600" id="sideName">Loading…</div><div style="font-size:10px;color:var(--t3);font-family:var(--fm)" id="sideUser">@loading</div></div>
+    </div>
+  </div>
+  <div class="ssec">
+    <div class="slbl">My Dashboard</div>
+    <div class="ni act" onclick="switchTab('overview')"><span class="nico">▦</span>Overview</div>
+    <div class="ni" onclick="switchTab('watchlist')"><span class="nico">☆</span>Watchlist<span class="nbadge" id="wlCount">5</span></div>
+    <div class="ni" onclick="switchTab('alerts')"><span class="nico">⚡</span>Alerts<span class="nbadge" id="alertCount">3</span></div>
+    <div class="ni" onclick="switchTab('notifications')"><span class="nico">🔔</span>Notifications<span class="nbadge" id="notifCount">7</span></div>
+    <div class="ni" onclick="switchTab('portfolio')"><span class="nico">◎</span>Portfolio</div>
+    <div class="ni" onclick="switchTab('activity')"><span class="nico">◷</span>Activity</div>
+  </div>
+  <div class="ssec">
+    <div class="slbl">Navigate</div>
+    <a class="ni" href="index.html"><span class="nico">◈</span>Markets</a>
+    <a class="ni" href="news-feed.html"><span class="nico">◷</span>News</a>
+    <a class="ni" href="forum.html"><span class="nico">◉</span>Forum</a>
+    <a class="ni" href="stock-detail.html"><span class="nico">⊞</span>Screener</a>
+  </div>
+  <div class="ssec">
+    <div class="slbl">Account</div>
+    <div class="ni" onclick="switchTab('settings')"><span class="nico">⚙</span>Settings</div>
+    <div class="ni" onclick="signOut()" style="color:var(--r)"><span class="nico">←</span>Sign Out</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- Profile Header -->
+  <div class="profile-hdr">
+    <div class="ph-layout">
+      <div class="ph-avatar-wrap">
+        <div class="ph-avatar" id="profileAvatar">SP</div>
+        <div class="ph-online"></div>
+      </div>
+      <div class="ph-info">
+        <div class="ph-name" id="profileName">Loading…</div>
+        <div class="ph-username" id="profileUser">@loading</div>
+        <div class="ph-badges">
+          <span class="ph-badge" style="color:var(--am);background:var(--amd);border-color:var(--amb)">Premium Member</span>
+          <span class="ph-badge" style="color:var(--g);background:var(--gd);border-color:var(--gb)">Verified</span>
+          <span class="ph-badge" style="color:var(--b);background:var(--bd);border-color:var(--bbr)">Since Jan 2024</span>
+        </div>
+        <div class="ph-bio">Positional trader | IT & Banking | NSE/BSE markets | Views are personal, not investment advice.</div>
+      </div>
+      <button class="edit-profile-btn" onclick="switchTab('settings')">✎ Edit Profile</button>
+    </div>
+    <div class="ph-stats">
+      <div class="phs"><div class="phs-val" style="color:var(--g)" id="statPosts">24</div><div class="phs-lbl">Posts</div></div>
+      <div class="phs"><div class="phs-val" style="color:var(--b)" id="statKarma">1,847</div><div class="phs-lbl">Karma</div></div>
+      <div class="phs"><div class="phs-val" id="statWL">5</div><div class="phs-lbl">Watchlist</div></div>
+      <div class="phs"><div class="phs-val" style="color:var(--am)" id="statAlerts">3</div><div class="phs-lbl">Active Alerts</div></div>
+    </div>
+  </div>
+
+  <!-- Dashboard Tabs -->
+  <div class="dash-tabs">
+    <div class="dtab act" id="tab-overview"    onclick="switchTab('overview')">Overview</div>
+    <div class="dtab" id="tab-watchlist"  onclick="switchTab('watchlist')">Watchlist</div>
+    <div class="dtab" id="tab-alerts"     onclick="switchTab('alerts')">Alerts</div>
+    <div class="dtab" id="tab-notifications" onclick="switchTab('notifications')">Notifications</div>
+    <div class="dtab" id="tab-portfolio"  onclick="switchTab('portfolio')">Portfolio</div>
+    <div class="dtab" id="tab-activity"   onclick="switchTab('activity')">Activity</div>
+    <div class="dtab" id="tab-settings"   onclick="switchTab('settings')">Settings</div>
+  </div>
+
+  <!-- Tab content -->
+  <div id="tabContent"></div>
+
+</main>
+</div>
+
+<!-- ALERT MODAL -->
+<div class="modal-overlay hidden" id="alertModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title">⚡ Create Price Alert</div>
+      <div class="modal-close" onclick="closeAlertModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Stock Symbol</label>
+        <input class="form-input" id="alertSym" placeholder="e.g. RELIANCE" style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alert Type</label>
+        <select class="form-select" id="alertType" onchange="updateAlertUI()">
+          <option value="price_above">Price rises above</option>
+          <option value="price_below">Price falls below</option>
+          <option value="pct_change">% change exceeds</option>
+          <option value="volume_spike">Volume spike (× avg)</option>
+          <option value="sentiment_shift">AI sentiment shifts to</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" id="alertValLabel">Target Price (₹)</label>
+        <input class="form-input" id="alertVal" type="number" placeholder="2900.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notify via</label>
+        <div style="display:flex;gap:10px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+            <div class="custom-cb checked" id="notifInApp" onclick="this.classList.toggle('checked')"></div>In-app
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+            <div class="custom-cb checked" id="notifEmail" onclick="this.classList.toggle('checked')"></div>Email
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+            <div class="custom-cb" id="notifSMS" onclick="this.classList.toggle('checked')"></div>SMS
+          </label>
+        </div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:10px 12px;font-size:11px;color:var(--t2)" id="alertPreview">
+        Alert preview will appear here…
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeAlertModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveAlert()">Create Alert</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ══════════════════════════════════════════
+// AUTH CHECK
+// ══════════════════════════════════════════
+const userData = JSON.parse(localStorage.getItem('sp_user') || '{"name":"Demo User","username":"demo_user","email":"demo@stockpulse.in"}');
+const token    = localStorage.getItem('sp_token');
+
+function signOut(){
+  localStorage.removeItem('sp_token');
+  localStorage.removeItem('sp_user');
+  window.location.href='auth.html';
+}
+
+// Populate user info
+document.getElementById('navUser').textContent=userData.username||userData.email||'User';
+document.getElementById('sideName').textContent=userData.name||'User';
+document.getElementById('sideUser').textContent='@'+(userData.username||'user');
+document.getElementById('profileName').textContent=userData.name||'User';
+document.getElementById('profileUser').textContent='@'+(userData.username||'user');
+const initials=(userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+document.getElementById('profileAvatar').textContent=initials;
+document.getElementById('sideAvatar').textContent=initials;
+
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+
+let watchlist=[
+  {sym:'RELIANCE',name:'Reliance Industries',price:2847.50,prev:2813.05,chg:+1.22,vol:'42.1M',mkt:'₹19.28L Cr',alertSet:true},
+  {sym:'TCS',     name:'Tata Consultancy Svcs',price:4021.35,prev:3986.80,chg:+0.87,vol:'8.4M',mkt:'₹14.62L Cr',alertSet:false},
+  {sym:'WIPRO',   name:'Wipro Ltd',price:487.30,prev:466.10,chg:+4.55,vol:'28.1M',mkt:'₹2.55L Cr',alertSet:true},
+  {sym:'SBIN',    name:'State Bank of India',price:724.15,prev:730.25,chg:-0.84,vol:'19.2M',mkt:'₹6.46L Cr',alertSet:false},
+  {sym:'INFY',    name:'Infosys',price:1889.20,prev:1827.40,chg:+3.38,vol:'15.3M',mkt:'₹7.85L Cr',alertSet:true},
+];
+
+let alerts=[
+  {id:'a1',sym:'WIPRO',  type:'price_above', value:500,   current:487.3, target:500,   channel:'email+app',active:true, triggered:false,  created:'Jan 15, 2025'},
+  {id:'a2',sym:'RELIANCE',type:'sentiment_shift',value:'bearish',current:'Bullish (62)',target:'Bearish',channel:'app',active:true,triggered:false,created:'Jan 12, 2025'},
+  {id:'a3',sym:'SBIN',  type:'price_below', value:700,   current:724.1, target:700,   channel:'email+sms+app',active:false,triggered:false,created:'Jan 10, 2025'},
+  {id:'a4',sym:'TCS',   type:'pct_change',  value:3,     current:0.87,  target:3,     channel:'app',active:true, triggered:true,   created:'Dec 28, 2024'},
+];
+
+const notifications=[
+  {id:'n1',type:'alert',  icon:'⚡',iconBg:'var(--amd)',iconClr:'var(--am)',title:'WIPRO target price approaching',  sub:'Current: ₹487.30 · Target: ₹500.00 · 97.4% reached',      time:'5m ago', unread:true},
+  {id:'n2',type:'news',   icon:'◷', iconBg:'var(--bd)', iconClr:'var(--b)', title:'Breaking: Wipro Q4 results released',sub:'Revenue +8.2%, guidance raised to 4-6%',                   time:'12m ago',unread:true},
+  {id:'n3',type:'comment',icon:'💬',iconBg:'var(--gd)', iconClr:'var(--g)', title:'NiftySage replied to your post',     sub:'"Good analysis. RSI also confirms the bull case…"',         time:'1h ago', unread:true},
+  {id:'n4',type:'vote',   icon:'▲', iconBg:'var(--gd)', iconClr:'var(--g)', title:'Your post got 50+ upvotes',         sub:'"Wipro Q4 Analysis: Why the guidance matters"',             time:'2h ago', unread:false},
+  {id:'n5',type:'alert',  icon:'⚡',iconBg:'var(--rd)', iconClr:'var(--r)', title:'ADANIENT crossed your watch price', sub:'Current: ₹2,741.85 · Your alert was ₹2,750',               time:'3h ago', unread:false},
+  {id:'n6',type:'market', icon:'📊',iconBg:'var(--bd)', iconClr:'var(--b)', title:'Nifty IT up 2.3% — your portfolio',  sub:'WIPRO +4.6%, INFY +3.4%, HCLTECH +3.7%',                  time:'4h ago', unread:false},
+  {id:'n7',type:'system', icon:'◈', iconBg:'var(--bg3)',iconClr:'var(--t2)',title:'Premium membership renewed',          sub:'Auto-renewed for ₹999/year. Next renewal: Jan 2026',        time:'1d ago', unread:false},
+];
+
+const TICKER_DATA=[
+  {s:'NIFTY50',p:22847.6,c:+1.24},{s:'SENSEX',p:75341.2,c:+1.18},{s:'WIPRO',p:487.3,c:+4.61},
+  {s:'RELIANCE',p:2847.5,c:+1.22},{s:'TCS',p:4021.3,c:+0.87},{s:'INFY',p:1889.2,c:+3.42},
+  {s:'HDFCBANK',p:1612.4,c:-1.93},{s:'SBIN',p:724.1,c:-0.84},{s:'MARUTI',p:12480.5,c:+2.84},
+];
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function switchTab(tab){
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('act'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+  const dt=document.getElementById(`tab-${tab}`);
+  if(dt) dt.classList.add('act');
+  // Update sidebar
+  const map={overview:0,watchlist:1,alerts:2,notifications:3,portfolio:4,activity:5,settings:6};
+  document.querySelectorAll('.ssec:first-of-type .ni')[map[tab]]?.classList.add('act');
+  renderTab(tab);
+}
+
+function renderTab(tab){
+  const tc=document.getElementById('tabContent');
+  if(tab==='overview')        tc.innerHTML=buildOverview();
+  else if(tab==='watchlist')  tc.innerHTML=buildWatchlist();
+  else if(tab==='alerts')     tc.innerHTML=buildAlerts();
+  else if(tab==='notifications') tc.innerHTML=buildNotifications();
+  else if(tab==='portfolio')  tc.innerHTML=buildPortfolio();
+  else if(tab==='activity')   tc.innerHTML=buildActivity();
+  else if(tab==='settings')   tc.innerHTML=buildSettings();
+  if(tab==='portfolio') setTimeout(drawPortfolioChart,50);
+}
+
+// ── OVERVIEW ──────────────────────────────
+function buildOverview(){
+  const upStocks=watchlist.filter(s=>s.chg>0).length;
+  const dnStocks=watchlist.filter(s=>s.chg<0).length;
+  const totalAlerts=alerts.filter(a=>a.active).length;
+  const unread=notifications.filter(n=>n.unread).length;
+  return `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      ${[
+        {l:'Watchlist',v:watchlist.length,sub:`${upStocks}↑ ${dnStocks}↓`,c:'var(--b)'},
+        {l:'Active Alerts',v:totalAlerts,sub:'${totalAlerts} active',c:'var(--am)'},
+        {l:'Unread Notifications',v:unread,sub:'notifications',c:'var(--r)'},
+        {l:'Karma',v:'1,847',sub:'All time',c:'var(--g)'},
+      ].map(s=>`
+        <div style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;padding:14px">
+          <div style="font-size:10px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm)">${s.l}</div>
+          <div style="font-family:var(--fm);font-size:22px;font-weight:600;color:${s.c}">${s.v}</div>
+          <div style="font-size:10px;color:var(--t2);margin-top:3px">${s.sub}</div>
+        </div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--b);display:inline-block"></span>
+          Watchlist Snapshot
+        </div>
+        <div style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+          ${watchlist.slice(0,4).map(s=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--br);cursor:pointer" onclick="window.location='stock-detail.html'" onmouseover="this.style.background='var(--bgh)'" onmouseout="this.style.background=''">
+              <div><div style="font-family:var(--fm);font-size:11px;font-weight:600">${s.sym}</div><div style="font-size:10px;color:var(--t3)">${s.name}</div></div>
+              <div style="text-align:right">
+                <div style="font-family:var(--fm);font-size:12px;font-weight:500">${fmtPrice(s.price)}</div>
+                <div class="${s.chg>=0?'up':'down'}" style="font-family:var(--fm);font-size:10px;padding:1px 5px;border-radius:2px">${s.chg>=0?'+':''}${s.chg.toFixed(2)}%</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--am);display:inline-block"></span>
+          Recent Notifications
+        </div>
+        <div style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+          ${notifications.slice(0,4).map(n=>`
+            <div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--br);${n.unread?'background:rgba(59,130,246,.03)':''}">
+              <div style="width:28px;height:28px;border-radius:6px;background:${n.iconBg};color:${n.iconClr};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${n.icon}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.title}</div>
+                <div style="font-family:var(--fm);font-size:9px;color:var(--t3);margin-top:2px">${n.time}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── WATCHLIST ─────────────────────────────
+function buildWatchlist(){
+  return `
+    <div class="wl-controls">
+      <div style="position:relative">
+        <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:13px">⌕</span>
+        <input class="wl-search" placeholder="Search watchlist…" oninput="filterWatchlist(this.value)" style="padding-left:28px">
+      </div>
+      <select class="wl-sort" onchange="sortWatchlist(this.value)">
+        <option value="name">Sort: Name</option>
+        <option value="price">Sort: Price</option>
+        <option value="change">Sort: % Change</option>
+        <option value="volume">Sort: Volume</option>
+      </select>
+      <button class="add-stock-btn" onclick="addToWatchlist()">+ Add Stock</button>
+    </div>
+    <div class="wl-table">
+      <div class="wl-thead">
+        <div class="wl-th">Symbol / Name</div>
+        <div class="wl-th">Price</div>
+        <div class="wl-th">Change</div>
+        <div class="wl-th">Volume</div>
+        <div class="wl-th">Market Cap</div>
+        <div class="wl-th" style="justify-content:flex-end">Actions</div>
+      </div>
+      <div id="wlRows">${renderWLRows(watchlist)}</div>
+    </div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--t3);display:flex;gap:14px">
+      <span>⟳ Auto-refreshes every 5 seconds</span>
+      <span>▲ Up: ${watchlist.filter(s=>s.chg>0).length} stocks</span>
+      <span>▼ Down: ${watchlist.filter(s=>s.chg<0).length} stocks</span>
+    </div>`;
+}
+
+function renderWLRows(stocks){
+  return stocks.map(s=>`
+    <div class="wl-row" onclick="window.location='stock-detail.html'">
+      <div><div class="wl-sym">${s.sym}</div><div class="wl-name">${s.name}</div></div>
+      <div class="wl-price">${fmtPrice(s.price)}</div>
+      <div><span class="wl-pct ${s.chg>=0?'pct-up':'pct-dn'}">${s.chg>=0?'+':''}${s.chg.toFixed(2)}%</span></div>
+      <div class="wl-vol">${s.vol}</div>
+      <div style="font-family:var(--fm);font-size:11px;color:var(--t2)">${s.mkt}</div>
+      <div class="wl-actions">
+        <div class="wla ${s.alertSet?'alert-set':''}" title="Set alert" onclick="event.stopPropagation();openAlertModal('${s.sym}')">⚡</div>
+        <div class="wla" title="View chart" onclick="event.stopPropagation();window.location='stock-detail.html'">◈</div>
+        <div class="wla" title="Remove" onclick="event.stopPropagation();removeFromWL('${s.sym}')">✕</div>
+      </div>
+    </div>`).join('');
+}
+
+function removeFromWL(sym){
+  watchlist=watchlist.filter(s=>s.sym!==sym);
+  renderTab('watchlist');
+  document.getElementById('statWL').textContent=watchlist.length;
+  document.getElementById('wlCount').textContent=watchlist.length;
+}
+
+function addToWatchlist(){
+  const sym=prompt('Enter stock symbol (e.g. HDFCBANK):');
+  if(!sym) return;
+  const s=sym.trim().toUpperCase();
+  if(watchlist.find(x=>x.sym===s)){alert(`${s} is already in your watchlist.`);return;}
+  watchlist.push({sym:s,name:s+' Ltd',price:(Math.random()*2000+500).toFixed(2)*1,prev:0,chg:(Math.random()*4-1).toFixed(2)*1,vol:Math.floor(Math.random()*20+1)+'M',mkt:'—',alertSet:false});
+  renderTab('watchlist');
+}
+
+function filterWatchlist(q){
+  const filtered=watchlist.filter(s=>s.sym.includes(q.toUpperCase())||s.name.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('wlRows').innerHTML=renderWLRows(filtered);
+}
+
+function sortWatchlist(by){
+  const sorted=[...watchlist].sort((a,b)=>by==='name'?a.sym.localeCompare(b.sym):by==='price'?b.price-a.price:by==='change'?b.chg-a.chg:b.vol.localeCompare(a.vol));
+  document.getElementById('wlRows').innerHTML=renderWLRows(sorted);
+}
+
+// ── ALERTS ────────────────────────────────
+function buildAlerts(){
+  const alertTypes={price_above:{icon:'⬆',bg:'var(--gd)',c:'var(--g)'},price_below:{icon:'⬇',bg:'var(--rd)',c:'var(--r)'},pct_change:{icon:'%',bg:'var(--bd)',c:'var(--b)'},volume_spike:{icon:'⚡',bg:'var(--amd)',c:'var(--am)'},sentiment_shift:{icon:'◈',bg:'var(--pud,rgba(139,92,246,.08))',c:'var(--pu,#8b5cf6)'}};
+  const typeLabel={price_above:'Price above ₹',price_below:'Price below ₹',pct_change:'% change > ',volume_spike:'Volume spike ×',sentiment_shift:'Sentiment shifts to '};
+  return `
+    <div class="alerts-grid">
+      ${alerts.map(a=>{
+        const t=alertTypes[a.type]||alertTypes.price_above;
+        const pct=a.type==='price_above'||a.type==='price_below'?Math.min(a.current/a.value*100,100).toFixed(0):null;
+        return `
+          <div class="alert-card ${a.triggered?'triggered':''}" id="alert-${a.id}">
+            <div class="ac-icon" style="background:${t.bg};color:${t.c};border:1px solid ${t.c}33">${t.icon}</div>
+            <div class="ac-content">
+              <div class="ac-title">${a.sym} — ${typeLabel[a.type]}${a.value}</div>
+              <div class="ac-meta">
+                <span>Current: ${typeof a.current==='number'?fmtPrice(a.current):a.current}</span>
+                <span>Target: ${typeof a.value==='number'&&a.type!=='pct_change'&&a.type!=='volume_spike'?fmtPrice(a.value):a.value}</span>
+                <span>Notify: ${a.channel}</span>
+                <span>Created: ${a.created}</span>
+                ${a.triggered?'<span style="color:var(--am);font-weight:600">⚡ Triggered</span>':''}
+              </div>
+              ${pct?`<div class="ac-progress"><div class="ac-fill" style="width:${pct}%;background:${a.type==='price_above'?'var(--g)':'var(--r)'}"></div></div>
+              <div class="ac-range"><span>${a.type==='price_above'?fmtPrice(a.current)+' current':'Low'}</span><span>Target: ${fmtPrice(a.value)} (${pct}%)</span></div>`:''}
+            </div>
+            <div class="ac-actions">
+              <div class="ac-toggle ${a.active?'on':''}" onclick="toggleAlert('${a.id}',this)" title="${a.active?'Active':'Inactive'}"></div>
+              <div class="wla" title="Edit" onclick="openAlertModal('${a.sym}')">✎</div>
+              <div class="wla" title="Delete" onclick="deleteAlert('${a.id}')">✕</div>
+            </div>
+          </div>`;}).join('')}
+      <button class="add-alert-btn" onclick="openAlertModal('')">+ Create New Alert</button>
+    </div>`;
+}
+
+function toggleAlert(id,toggle){
+  const a=alerts.find(x=>x.id===id);
+  if(a){a.active=!a.active;toggle.classList.toggle('on',a.active);}
+}
+
+function deleteAlert(id){
+  const el=document.getElementById(`alert-${id}`);
+  if(el){el.style.opacity='0';el.style.transform='translateX(20px)';el.style.transition='all .3s';setTimeout(()=>{alerts=alerts.filter(a=>a.id!==id);renderTab('alerts');},300);}
+}
+
+// ── NOTIFICATIONS ─────────────────────────
+function buildNotifications(){
+  const unread=notifications.filter(n=>n.unread).length;
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:var(--fd);font-size:13px;font-weight:700">Notifications <span style="color:var(--r);font-family:var(--fm);font-size:12px">${unread} unread</span></div>
+      <div style="display:flex;gap:6px">
+        <button onclick="markAllRead()" style="background:var(--gd);border:1px solid var(--gb);border-radius:5px;padding:5px 12px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--g);cursor:pointer">✓ Mark all read</button>
+        <button onclick="clearAll()" style="background:var(--rd);border:1px solid var(--rb);border-radius:5px;padding:5px 12px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--r);cursor:pointer">✕ Clear all</button>
+      </div>
+    </div>
+    <div style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+      ${notifications.map(n=>`
+        <div class="notif-item ${n.unread?'unread':''}" onclick="markRead('${n.id}',this)">
+          <div class="ni-icon" style="background:${n.iconBg};color:${n.iconClr};border:1px solid ${n.iconClr}33">${n.icon}</div>
+          <div class="ni-content">
+            <div class="ni-title">${n.title}</div>
+            <div class="ni-meta"><span>${n.sub}</span><span>·</span><span>${n.time}</span></div>
+          </div>
+          <div class="ni-actions">
+            ${n.unread?'<span style="width:8px;height:8px;border-radius:50%;background:var(--b);display:inline-block"></span>':''}
+            <span style="font-family:var(--fm);font-size:9px;color:var(--t3)">${n.time}</span>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function markRead(id,el){
+  const n=notifications.find(x=>x.id===id);
+  if(n){n.unread=false;el.classList.remove('unread');el.querySelector('[style*="border-radius:50%"]')?.remove();}
+  const unread=notifications.filter(x=>x.unread).length;
+  document.getElementById('notifCount').textContent=unread;
+  if(!unread) document.getElementById('notifDot').style.display='none';
+}
+function markAllRead(){notifications.forEach(n=>n.unread=false);renderTab('notifications');}
+function clearAll(){notifications.length=0;renderTab('notifications');}
+
+// ── PORTFOLIO ─────────────────────────────
+function buildPortfolio(){
+  return `
+    <div class="pf-summary">
+      <div class="pfs-card"><div class="pfs-lbl">Portfolio Value</div><div class="pfs-val">₹4,12,847</div><div class="pfs-sub up">↑ +₹18,240 today</div></div>
+      <div class="pfs-card"><div class="pfs-lbl">Total P&L</div><div class="pfs-val" style="color:var(--g)">+₹48,120</div><div class="pfs-sub up">+13.2% overall</div></div>
+      <div class="pfs-card"><div class="pfs-lbl">Today's P&L</div><div class="pfs-val" style="color:var(--g)">+₹5,847</div><div class="pfs-sub up">+1.4% today</div></div>
+    </div>
+    <canvas id="portfolioChart" height="200" style="width:100%;background:var(--bgc);border:1px solid var(--br);border-radius:8px;padding:16px;margin-bottom:16px"></canvas>
+    <div style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+      <div style="padding:10px 16px;border-bottom:1px solid var(--br);font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)">Holdings</div>
+      ${watchlist.map((s,i)=>{
+        const invested=[50000,80000,30000,40000,60000][i]||30000;
+        const pnl=invested*(s.chg/100*15);
+        const isProfit=pnl>=0;
+        return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;align-items:center;padding:11px 16px;border-bottom:1px solid var(--br);cursor:pointer" onmouseover="this.style.background='var(--bgh)'" onmouseout="this.style.background=''">
+          <div><div style="font-family:var(--fm);font-size:11px;font-weight:600">${s.sym}</div><div style="font-size:10px;color:var(--t3)">${Math.floor(invested/s.price)} shares</div></div>
+          <div style="font-family:var(--fm);font-size:12px">${fmtPrice(s.price)}</div>
+          <div style="font-family:var(--fm);font-size:11px">₹${invested.toLocaleString('en-IN')}</div>
+          <div style="font-family:var(--fm);font-size:11px;color:${isProfit?'var(--g)':'var(--r)'}">₹${Math.abs(pnl).toFixed(0)} (${isProfit?'+':''}${(pnl/invested*100).toFixed(1)}%)</div>
+          <div><span class="wl-pct ${s.chg>=0?'pct-up':'pct-dn'}">${s.chg>=0?'+':''}${s.chg.toFixed(2)}%</span></div>
+        </div>`;}).join('')}
+    </div>`;
+}
+
+function drawPortfolioChart(){
+  const canvas=document.getElementById('portfolioChart');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const labels=['Oct','Nov','Dec','Jan','Feb','Mar'];
+  const values=[340000,360000,355000,380000,400000,412847];
+  const grad=ctx.createLinearGradient(0,0,0,180);
+  grad.addColorStop(0,'rgba(0,214,143,.15)');grad.addColorStop(1,'rgba(0,214,143,0)');
+  new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{data:values,borderColor:'#00d68f',borderWidth:2,backgroundColor:grad,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00d68f'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`₹${c.parsed.y.toLocaleString('en-IN')}`}}},
+    scales:{x:{grid:{color:'rgba(30,45,61,.4)'},ticks:{color:'#4a5a6e',font:{size:10,family:"'IBM Plex Mono'"}}},y:{position:'right',grid:{color:'rgba(30,45,61,.4)'},ticks:{color:'#4a5a6e',font:{size:10},callback:v=>`₹${(v/1000).toFixed(0)}K`}}}}
+  });
+}
+
+// ── ACTIVITY ──────────────────────────────
+function buildActivity(){
+  const acts=[
+    {icon:'▲',bg:'var(--gd)',c:'var(--g)',text:'Your post <strong>Wipro Q4 Analysis</strong> was upvoted 50 times',time:'2h ago'},
+    {icon:'💬',bg:'var(--bd)',c:'var(--b)',text:'You commented on <strong>HDFC Bank NIM analysis</strong> by ValueHunter',time:'4h ago'},
+    {icon:'☆',bg:'var(--bg3)',c:'var(--t2)',text:'Added <strong>INFY</strong> to your watchlist',time:'Yesterday'},
+    {icon:'⚡',bg:'var(--amd)',c:'var(--am)',text:'Alert created for <strong>WIPRO</strong> at ₹500 target',time:'Jan 15'},
+    {icon:'◷',bg:'var(--bd)',c:'var(--b)',text:'Bookmarked news article <strong>RBI shifts stance to neutral</strong>',time:'Jan 14'},
+    {icon:'✎',bg:'var(--gd)',c:'var(--g)',text:'Posted <strong>Technical setup: NIFTY 23,200 target</strong> in Analysis',time:'Jan 13'},
+    {icon:'▲',bg:'var(--gd)',c:'var(--g)',text:'Upvoted post by <strong>LongTermLearner</strong> on ETF investing',time:'Jan 12'},
+  ];
+  return `
+    <div style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden">
+      <div style="padding:10px 16px;border-bottom:1px solid var(--br);font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)">Recent Activity</div>
+      <div style="padding:0 16px">
+        ${acts.map(a=>`
+          <div class="activity-item">
+            <div class="act-icon" style="background:${a.bg};color:${a.c};border:1px solid ${a.c}33;width:32px;height:32px">${a.icon}</div>
+            <div class="act-text">${a.text}</div>
+            <div class="act-time">${a.time}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── SETTINGS ──────────────────────────────
+function buildSettings(){
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div class="settings-section">
+          <div class="settings-hdr">Profile Information</div>
+          <div style="padding:16px">
+            <div class="form-group" style="margin-bottom:12px"><label style="font-family:var(--fm);font-size:10px;color:var(--t3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Full Name</label><input style="width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:8px 12px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" value="${userData.name||''}"></div>
+            <div class="form-group" style="margin-bottom:12px"><label style="font-family:var(--fm);font-size:10px;color:var(--t3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Username</label><input style="width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:8px 12px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" value="${userData.username||''}"></div>
+            <div class="form-group" style="margin-bottom:12px"><label style="font-family:var(--fm);font-size:10px;color:var(--t3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Email</label><input style="width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:8px 12px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" value="${userData.email||''}"></div>
+            <div class="form-group" style="margin-bottom:12px"><label style="font-family:var(--fm);font-size:10px;color:var(--t3);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Bio</label><textarea style="width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:8px 12px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;resize:vertical;min-height:72px">Positional trader | IT & Banking</textarea></div>
+            <button onclick="alert('Profile saved!')" style="background:var(--b);color:#fff;border:none;border-radius:6px;padding:9px 20px;font-family:var(--fd);font-size:13px;font-weight:700;cursor:pointer;width:100%">Save Changes</button>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-hdr">Security</div>
+          <div class="settings-row"><div><div class="sr-label">Password</div><div class="sr-sub">Last changed 3 months ago</div></div><button onclick="alert('Password change email sent!')" style="background:var(--bg3);border:1px solid var(--br);border-radius:5px;padding:6px 14px;font-size:11px;color:var(--t1);cursor:pointer">Change</button></div>
+          <div class="settings-row"><div><div class="sr-label">Two-Factor Auth</div><div class="sr-sub">Add extra security with TOTP</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="settings-row"><div><div class="sr-label">Active Sessions</div><div class="sr-sub">2 devices signed in</div></div><button onclick="alert('All other sessions terminated.')" style="background:var(--rd);border:1px solid var(--rb);border-radius:5px;padding:6px 14px;font-size:11px;color:var(--r);cursor:pointer">Revoke All</button></div>
+        </div>
+      </div>
+      <div>
+        <div class="settings-section">
+          <div class="settings-hdr">Notification Preferences</div>
+          ${[
+            {l:'Price Alerts',s:'Get notified when your alert conditions are met',on:true},
+            {l:'Breaking News',s:'Receive alerts for high-impact financial news',on:true},
+            {l:'Forum Replies',s:'When someone replies to your posts',on:true},
+            {l:'Forum Upvotes',s:'When your posts receive upvotes',on:false},
+            {l:'Market Summary',s:'Daily market digest at 9:00 AM IST',on:true},
+            {l:'Weekly Report',s:'Your portfolio performance summary',on:false},
+          ].map(s=>`<div class="settings-row"><div><div class="sr-label">${s.l}</div><div class="sr-sub">${s.s}</div></div><div class="toggle ${s.on?'on':''}" onclick="this.classList.toggle('on')"></div></div>`).join('')}
+        </div>
+        <div class="settings-section">
+          <div class="settings-hdr">Display Preferences</div>
+          ${[
+            {l:'Dark Mode',s:'Use dark theme (recommended for traders)',on:true},
+            {l:'Compact View',s:'Show more stocks on screen at once',on:false},
+            {l:'Animated Prices',s:'Flash on price changes in watchlist',on:true},
+            {l:'Sound Alerts',s:'Audio notification for triggered alerts',on:false},
+          ].map(s=>`<div class="settings-row"><div><div class="sr-label">${s.l}</div><div class="sr-sub">${s.s}</div></div><div class="toggle ${s.on?'on':''}" onclick="this.classList.toggle('on')"></div></div>`).join('')}
+        </div>
+        <div class="settings-section">
+          <div class="settings-hdr">Danger Zone</div>
+          <div class="settings-row"><div><div class="sr-label">Export My Data</div><div class="sr-sub">Download all your posts, alerts, and watchlist</div></div><button onclick="alert('Export queued. You will receive an email in 5 minutes.')" style="background:var(--bg3);border:1px solid var(--br);border-radius:5px;padding:6px 14px;font-size:11px;color:var(--t1);cursor:pointer">Export</button></div>
+          <div class="settings-row"><div><div class="sr-label" style="color:var(--r)">Delete Account</div><div class="sr-sub">Permanently remove your account and all data</div></div><button onclick="confirm('Are you sure? This cannot be undone.')&&alert('Account deletion email sent.')" style="background:var(--rd);border:1px solid var(--rb);border-radius:5px;padding:6px 14px;font-size:11px;color:var(--r);cursor:pointer">Delete</button></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// ALERT MODAL
+// ══════════════════════════════════════════
+function openAlertModal(sym){
+  document.getElementById('alertSym').value=sym||'';
+  document.getElementById('alertModal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  updateAlertPreview();
+}
+function closeAlertModal(){
+  document.getElementById('alertModal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function updateAlertUI(){
+  const t=document.getElementById('alertType').value;
+  const labels={price_above:'Target Price (₹)',price_below:'Target Price (₹)',pct_change:'% Threshold',volume_spike:'Volume Multiplier (×)',sentiment_shift:'Target Sentiment'};
+  document.getElementById('alertValLabel').textContent=labels[t];
+  updateAlertPreview();
+}
+function updateAlertPreview(){
+  const sym=document.getElementById('alertSym').value||'SYMBOL';
+  const t=document.getElementById('alertType').value;
+  const v=document.getElementById('alertVal').value||'—';
+  const previews={price_above:`Alert when ${sym} price rises above ₹${v}`,price_below:`Alert when ${sym} price falls below ₹${v}`,pct_change:`Alert when ${sym} changes more than ${v}% in a session`,volume_spike:`Alert when ${sym} volume exceeds ${v}× 30-day average`,sentiment_shift:`Alert when AI sentiment for ${sym} shifts to ${v}`};
+  document.getElementById('alertPreview').textContent=previews[t]||'';
+}
+function saveAlert(){
+  const sym=document.getElementById('alertSym').value.trim().toUpperCase();
+  if(!sym){alert('Please enter a stock symbol.');return;}
+  const t=document.getElementById('alertType').value;
+  const v=document.getElementById('alertVal').value;
+  alerts.unshift({id:'a'+Date.now(),sym,type:t,value:v,current:'—',target:v,channel:'email+app',active:true,triggered:false,created:'Just now'});
+  closeAlertModal();
+  renderTab('alerts');
+}
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function fmtPrice(v){return'₹'+parseFloat(v).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function renderTicker(){
+  const items=[...TICKER_DATA,...TICKER_DATA];
+  document.getElementById('tk').innerHTML=items.map(d=>`
+    <div class="tki"><span class="tksym">${d.s}</span>
+    <span class="tkprc">₹${d.p.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+    <span class="tkchg ${d.c>0?'up':'down'}">${d.c>0?'+':''}${d.c.toFixed(2)}%</span></div>`).join('');
+}
+
+// Live price simulation
+function simulatePrices(){
+  watchlist.forEach(s=>{const d=(Math.random()-.499)*.2;s.price=+(s.price*(1+d/100)).toFixed(2);s.chg=+(s.chg+(Math.random()-.5)*.05).toFixed(2);});
+}
+
+// Notification dot
+document.getElementById('notifDot').style.display=notifications.filter(n=>n.unread).length?'block':'none';
+
+// Custom checkbox style
+document.head.insertAdjacentHTML('beforeend',`<style>.custom-cb{width:16px;height:16px;background:var(--bg3);border:1px solid var(--br);border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}.custom-cb.checked{background:var(--b);border-color:var(--b)}.custom-cb.checked::after{content:'✓';color:#fff;font-size:10px;font-weight:700}</style>`);
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.addEventListener('load',()=>{
+  renderTicker();
+  switchTab('overview');
+  setInterval(simulatePrices,4000);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAlertModal();});
+  document.getElementById('alertType').addEventListener('change',updateAlertPreview);
+  document.getElementById('alertSym').addEventListener('input',updateAlertPreview);
+  document.getElementById('alertVal').addEventListener('input',updateAlertPreview);
+});
+</script>
+</body>
+</html>

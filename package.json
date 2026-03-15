@@ -1,0 +1,16 @@
+{
+  "name": "stockpulse",
+  "version": "1.0.0",
+  "description": "```\r stockpulse/\r ├── frontend/\r │   ├── index.html                         ← ✅ STANDALONE DEMO (open in browser)\r │   ├── package.json                       ← Next.js dependencies\r │   ├── styles/\r │   │   └── globals.css                    ← Complete dark trading CSS design system\r │   ├── components/\r │   │   ├── layout/\r │   │   │   ├── AppLayout.jsx              ← Root layout wrapper\r │   │   │   └── Sidebar.jsx                ← Navigation + watchlist\r │   │   └── dashboard/\r │   │       ├── MarketDashboard.jsx        ← Main dashboard page\r │   │       └── CompanyAnalytics.jsx       ← Screener-style financials\r │   ├── hooks/\r │   │   └── useWebSocket.js                ← WebSocket hook with auto-reconnect\r │   └── lib/\r │       └── formatters.js                  ← INR formatters, time, sentiment\r ```",
+  "main": "authhelper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "serve": "^14.2.6"
+  }
+}

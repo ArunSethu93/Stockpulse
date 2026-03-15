@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Forum — StockPulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c10;--bg2:#0d1117;--bg3:#161b22;--bgc:#0f1923;--bgh:#1a2332;
+  --br:#1e2d3d;--bra:#2d4a6e;
+  --t1:#e8edf3;--t2:#8b9ab0;--t3:#4a5a6e;
+  --g:#00d68f;--gd:rgba(0,214,143,.08);--gb:rgba(0,214,143,.2);
+  --r:#ff4d6d;--rd:rgba(255,77,109,.08);--rb:rgba(255,77,109,.2);
+  --b:#3b82f6;--bd:rgba(59,130,246,.10);--bbr:rgba(59,130,246,.2);
+  --am:#f59e0b;--amd:rgba(245,158,11,.08);--amb:rgba(245,158,11,.2);
+  --cy:#06b6d4;--cyd:rgba(6,182,212,.08);--cyb:rgba(6,182,212,.2);
+  --pu:#8b5cf6;--pud:rgba(139,92,246,.08);
+  --fm:'IBM Plex Mono',monospace;--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+  --sw:220px;--th:40px;--nh:48px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:13px;line-height:1.5;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--br);border-radius:2px}
+
+/* ─── TICKER ─── */
+.tkbar{background:var(--bg2);border-bottom:1px solid var(--br);height:var(--th);overflow:hidden;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center}
+.tklbl{background:var(--b);color:#fff;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.08em;padding:0 12px;height:100%;display:flex;align-items:center;flex-shrink:0}
+.tkscroll{display:flex;animation:tks 50s linear infinite}
+.tkscroll:hover{animation-play-state:paused}
+@keyframes tks{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tki{display:flex;align-items:center;gap:8px;padding:0 16px;border-right:1px solid var(--br);height:var(--th);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:background .15s}
+.tki:hover{background:var(--bgh)}
+.tksym{font-family:var(--fm);font-size:11px;font-weight:600}
+.tkprc{font-family:var(--fm);font-size:11px;color:var(--t2)}
+.tkchg{font-family:var(--fm);font-size:10px;font-weight:500;padding:1px 5px;border-radius:2px}
+.up{color:var(--g);background:var(--gd)}.down{color:var(--r);background:var(--rd)}
+
+/* ─── TOPNAV ─── */
+.nav{position:fixed;top:var(--th);left:0;right:0;height:var(--nh);background:var(--bg2);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 16px;gap:14px;z-index:99}
+.logo{font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:6px}
+.ldot{width:8px;height:8px;background:var(--g);border-radius:50%;animation:pd 2s ease-in-out infinite}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.bcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2)}
+.bcrumb a{color:var(--b)}.bcrumb strong{color:var(--t1);font-family:var(--fm)}
+.nr{margin-left:auto;display:flex;align-items:center;gap:8px}
+.ibtn{width:32px;height:32px;background:var(--bg3);border:1px solid var(--br);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:13px;transition:all .15s;position:relative}
+.ibtn:hover{background:var(--bgh);color:var(--t1);border-color:var(--bra)}
+.ibtn .ndot{position:absolute;top:5px;right:5px;width:5px;height:5px;background:var(--r);border-radius:50%;border:1px solid var(--bg2)}
+.pbtn{background:var(--b);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.pbtn:hover{opacity:.85}
+
+/* ─── LAYOUT ─── */
+.wrap{display:flex;padding-top:calc(var(--th)+var(--nh))}
+.sidebar{width:var(--sw);background:var(--bg2);border-right:1px solid var(--br);position:fixed;top:calc(var(--th)+var(--nh));bottom:0;left:0;overflow-y:auto;z-index:50;padding:12px 0}
+.ssec{padding:0 8px;margin-bottom:18px}
+.slbl{font-family:var(--fm);font-size:9px;font-weight:600;letter-spacing:.12em;color:var(--t3);text-transform:uppercase;padding:0 12px;margin-bottom:4px}
+.ni{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:6px;cursor:pointer;color:var(--t2);font-size:13px;transition:all .15s;border:1px solid transparent}
+.ni:hover{background:var(--bgh);color:var(--t1)}
+.ni.act{background:var(--bd);color:var(--b);border-color:var(--bbr)}
+.nico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;font-family:var(--fm);font-size:9px;padding:1px 5px;border-radius:8px}
+.main{flex:1;margin-left:var(--sw);margin-right:290px;padding:20px;min-width:0}
+.rpanel{width:290px;background:var(--bg2);border-left:1px solid var(--br);position:fixed;top:calc(var(--th)+var(--nh));right:0;bottom:0;overflow-y:auto;padding:16px}
+
+/* ─── FORUM HEADER ─── */
+.forum-hdr{background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:20px;margin-bottom:18px;position:relative;overflow:hidden}
+.forum-hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--b),var(--pu),var(--cy))}
+.fh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fh-title{font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.fh-sub{font-size:12px;color:var(--t2)}
+.fh-stats{display:flex;gap:20px}
+.fhs{text-align:center}
+.fhs-val{font-family:var(--fm);font-size:18px;font-weight:600;color:var(--t1)}
+.fhs-lbl{font-size:10px;color:var(--t3);margin-top:2px}
+.fh-actions{display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap}
+
+/* ─── COMPOSER ─── */
+.composer{background:var(--bg2);border:1px solid var(--br);border-radius:8px;margin-bottom:18px;overflow:hidden;transition:border-color .2s}
+.composer:focus-within{border-color:var(--bra)}
+.composer-tabs{display:flex;border-bottom:1px solid var(--br);background:var(--bg3)}
+.ctab{padding:9px 16px;font-size:12px;font-weight:500;cursor:pointer;color:var(--t2);border-bottom:2px solid transparent;transition:all .15s}
+.ctab:hover{color:var(--t1)}
+.ctab.act{color:var(--b);border-bottom-color:var(--b);background:var(--bg2)}
+.composer-body{padding:14px 16px}
+.composer-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+.cavatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:12px;font-weight:600;color:#fff;flex-shrink:0;border:1.5px solid var(--bra)}
+.ctitle-input{width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:8px 12px;color:var(--t1);font-family:var(--fd);font-size:14px;font-weight:600;outline:none;transition:border-color .2s;margin-bottom:8px}
+.ctitle-input:focus{border-color:var(--b)}
+.ctitle-input::placeholder{color:var(--t3);font-weight:400}
+.cbody-input{width:100%;background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:10px 12px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;resize:vertical;min-height:100px;transition:border-color .2s;line-height:1.6}
+.cbody-input:focus{border-color:var(--b)}
+.cbody-input::placeholder{color:var(--t3)}
+.composer-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--br);background:var(--bg3)}
+.tag-input-wrap{display:flex;align-items:center;gap:6px;flex:1}
+.tag-input{background:transparent;border:none;outline:none;color:var(--t1);font-family:var(--fm);font-size:11px;flex:1;min-width:80px}
+.tag-input::placeholder{color:var(--t3)}
+.added-tags{display:flex;gap:4px;flex-wrap:wrap}
+.atag{font-family:var(--fm);font-size:10px;color:var(--b);background:var(--bd);border:1px solid var(--bbr);padding:2px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.atag:hover .rm{opacity:1}
+.rm{opacity:.4;font-size:10px;transition:opacity .15s}
+.sent-btns{display:flex;gap:4px}
+.sbtn{padding:4px 10px;border-radius:12px;font-family:var(--fm);font-size:10px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s;opacity:.5}
+.sbtn.sel{opacity:1}
+.sbtn-bull{color:var(--g);border-color:var(--gb);background:var(--gd)}
+.sbtn-neut{color:var(--am);border-color:var(--amb);background:var(--amd)}
+.sbtn-bear{color:var(--r);border-color:var(--rb);background:var(--rd)}
+.post-btn{background:var(--b);color:#fff;border:none;border-radius:6px;padding:7px 20px;font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;transition:opacity .15s;margin-left:auto}
+.post-btn:hover{opacity:.85}
+.post-btn:disabled{opacity:.4;cursor:not-allowed}
+.char-count{font-family:var(--fm);font-size:10px;color:var(--t3)}
+
+/* ─── SORT BAR ─── */
+.sort-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.sort-tabs{display:flex;gap:2px;background:var(--bg3);padding:2px;border-radius:6px}
+.stab{padding:5px 14px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;color:var(--t2);transition:all .15s}
+.stab:hover{color:var(--t1)}
+.stab.act{background:var(--bg2);color:var(--t1)}
+.active-filter{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;color:var(--b);background:var(--bd);border:1px solid var(--bbr);padding:3px 10px;border-radius:12px;cursor:pointer}
+.active-filter:hover{background:var(--bg3)}
+.post-count{font-family:var(--fm);font-size:10px;color:var(--t3);margin-left:auto}
+
+/* ─── POST CARD ─── */
+.post-card{background:var(--bgc);border:1px solid var(--br);border-radius:8px;margin-bottom:12px;display:flex;transition:all .2s;overflow:hidden;cursor:pointer}
+.post-card:hover{border-color:var(--bra)}
+.post-card.pinned{border-color:var(--amb);background:rgba(245,158,11,.03)}
+.post-card.new-post{animation:slide-in .4s ease}
+@keyframes slide-in{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Vote column */
+.vote-col{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 12px;min-width:52px;background:var(--bg3);border-right:1px solid var(--br)}
+.vote-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .15s;color:var(--t3)}
+.vote-btn:hover{background:var(--bgh);color:var(--t1)}
+.vote-btn.voted-up{color:var(--g);background:var(--gd)}
+.vote-btn.voted-down{color:var(--r);background:var(--rd)}
+.vote-score{font-family:var(--fm);font-size:12px;font-weight:600;line-height:1}
+.vote-score.pos{color:var(--g)}.vote-score.neg{color:var(--r)}.vote-score.zero{color:var(--t3)}
+
+/* Post body */
+.post-body-wrap{flex:1;padding:14px 16px;min-width:0}
+.post-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.post-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:9px;font-weight:600;flex-shrink:0}
+.post-user{font-size:12px;font-weight:500;color:var(--t1)}
+.user-badge{font-family:var(--fm);font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px;border:1px solid}
+.post-time{font-family:var(--fm);font-size:10px;color:var(--t3)}
+.pinned-flag{font-family:var(--fm);font-size:9px;color:var(--am);background:var(--amd);border:1px solid var(--amb);padding:1px 6px;border-radius:3px}
+.post-title{font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--t1);line-height:1.35;margin-bottom:6px}
+.post-preview{font-size:12px;color:var(--t2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
+.post-tags-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.stock-tag{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;border:1px solid;cursor:pointer;transition:all .15s}
+.hash-tag{font-family:var(--fm);font-size:10px;color:var(--t3);background:var(--bg3);border:1px solid var(--br);padding:1px 7px;border-radius:3px;cursor:pointer}
+.hash-tag:hover{color:var(--b)}
+.post-footer{display:flex;align-items:center;gap:14px;font-family:var(--fm);font-size:11px;color:var(--t2)}
+.pf-btn{display:flex;align-items:center;gap:5px;cursor:pointer;padding:4px 6px;border-radius:4px;transition:all .15s}
+.pf-btn:hover{color:var(--t1);background:var(--bg3)}
+.pf-btn.active-reply{color:var(--b);background:var(--bd)}
+.pf-award{color:var(--am)}
+.sent-badge{margin-left:auto;font-family:var(--fm);font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px;border:1px solid}
+.sb-bull{color:var(--g);background:var(--gd);border-color:var(--gb)}
+.sb-bear{color:var(--r);background:var(--rd);border-color:var(--rb)}
+.sb-neut{color:var(--am);background:var(--amd);border-color:var(--amb)}
+
+/* ─── POST DETAIL / COMMENTS ─── */
+.post-detail{background:var(--bgc);border:1px solid var(--br);border-radius:8px;margin-bottom:16px;overflow:hidden}
+.pd-header{padding:18px 20px;border-bottom:1px solid var(--br)}
+.pd-body{padding:20px;font-size:13px;color:var(--t2);line-height:1.8;border-bottom:1px solid var(--br)}
+.pd-body p{margin-bottom:12px}
+.pd-body p:last-child{margin-bottom:0}
+.pd-body strong{color:var(--t1);font-weight:500}
+.pd-body .inline-chart{background:var(--bg3);border:1px solid var(--br);border-radius:6px;padding:10px 14px;margin:12px 0;font-family:var(--fm);font-size:11px}
+.pd-actions{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--br);font-family:var(--fm);font-size:11px;color:var(--t2)}
+
+/* Comment area */
+.comments-area{padding:16px 20px}
+.comments-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.comments-count{font-family:var(--fd);font-size:14px;font-weight:700}
+.comment-sort{display:flex;gap:2px;background:var(--bg3);padding:2px;border-radius:5px}
+.csort-btn{padding:4px 10px;border-radius:3px;font-family:var(--fm);font-size:10px;cursor:pointer;color:var(--t3);transition:all .15s}
+.csort-btn.act{background:var(--bg2);color:var(--t1)}
+
+/* Reply composer */
+.reply-composer{background:var(--bg3);border:1px solid var(--br);border-radius:8px;padding:12px;margin-bottom:16px}
+.reply-input{width:100%;background:var(--bgc);border:1px solid var(--br);border-radius:6px;padding:8px 12px;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none;resize:vertical;min-height:72px;transition:border-color .2s}
+.reply-input:focus{border-color:var(--b)}
+.reply-footer{display:flex;align-items:center;gap:8px;margin-top:8px}
+.reply-btn{background:var(--b);color:#fff;border:none;border-radius:6px;padding:6px 16px;font-family:var(--fb);font-size:12px;cursor:pointer;transition:opacity .15s}
+.reply-btn:hover{opacity:.85}
+.cancel-btn{font-size:11px;color:var(--t3);cursor:pointer;transition:color .15s}
+.cancel-btn:hover{color:var(--t2)}
+.fmt-btns{display:flex;gap:2px}
+.fmt-btn{width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;color:var(--t3);background:var(--bgc);border:1px solid var(--br);transition:all .15s;font-weight:600}
+.fmt-btn:hover{color:var(--t1);background:var(--bgh)}
+
+/* Comment thread */
+.comment{padding:14px 0;border-bottom:1px solid var(--br)}
+.comment:last-child{border-bottom:none}
+.comment-row{display:flex;gap:10px}
+.comment-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;font-weight:600;flex-shrink:0}
+.comment-content{flex:1;min-width:0}
+.comment-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.c-user{font-size:12px;font-weight:500}
+.c-time{font-family:var(--fm);font-size:10px;color:var(--t3)}
+.c-badge{font-family:var(--fm);font-size:8px;padding:1px 5px;border-radius:3px;border:1px solid}
+.comment-text{font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.comment-text strong{color:var(--t1);font-weight:500}
+.comment-actions{display:flex;align-items:center;gap:10px;font-family:var(--fm);font-size:10px;color:var(--t3)}
+.ca-btn{cursor:pointer;transition:color .15s;display:flex;align-items:center;gap:4px;padding:2px 5px;border-radius:3px}
+.ca-btn:hover{color:var(--t1);background:var(--bg3)}
+.ca-btn.voted{color:var(--g)}
+.ca-btn.downvoted{color:var(--r)}
+.thread-line{width:2px;background:var(--br);border-radius:1px;margin:4px 13px;align-self:stretch;cursor:pointer;transition:background .15s}
+.thread-line:hover{background:var(--bra)}
+
+/* Nested replies */
+.nested-replies{margin-top:10px;padding-left:20px;border-left:2px solid var(--br)}
+.nested-replies .comment{padding:10px 0}
+
+/* Collapsed indicator */
+.collapse-btn{font-family:var(--fm);font-size:10px;color:var(--b);cursor:pointer;padding:2px 6px;border-radius:3px;background:var(--bd);border:1px solid var(--bbr);display:inline-flex;align-items:center;gap:4px}
+.collapse-btn:hover{background:var(--bg3)}
+
+/* ─── MODERATION PANEL ─── */
+.mod-panel{background:var(--bgc);border:1px solid var(--br);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.mod-header{background:var(--rd);border-bottom:1px solid var(--rb);padding:12px 16px;display:flex;align-items:center;gap:8px}
+.mod-title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--r);flex:1}
+.mod-badge{font-family:var(--fm);font-size:9px;color:#fff;background:var(--r);padding:2px 7px;border-radius:8px}
+.mod-item{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--br);align-items:flex-start}
+.mod-item:last-child{border-bottom:none}
+.mod-item:hover{background:var(--bgh)}
+.mod-type{font-family:var(--fm);font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;border:1px solid;flex-shrink:0;margin-top:2px}
+.mt-spam{color:var(--r);background:var(--rd);border-color:var(--rb)}
+.mt-hate{color:var(--am);background:var(--amd);border-color:var(--amb)}
+.mt-report{color:var(--b);background:var(--bd);border-color:var(--bbr)}
+.mod-content{flex:1;min-width:0}
+.mod-text{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mod-meta{font-family:var(--fm);font-size:9px;color:var(--t3);display:flex;gap:8px}
+.mod-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.mact{font-family:var(--fm);font-size:9px;font-weight:600;padding:4px 10px;border-radius:4px;cursor:pointer;border:1px solid;transition:all .15s;text-align:center}
+.mact-remove{color:var(--r);border-color:var(--rb);background:var(--rd)}
+.mact-remove:hover{background:var(--r);color:#fff}
+.mact-keep{color:var(--g);border-color:var(--gb);background:var(--gd)}
+.mact-keep:hover{background:var(--g);color:#000}
+.spam-score{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9px;color:var(--t3)}
+.spam-bar{flex:1;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:40px}
+.spam-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* ─── RIGHT PANEL ─── */
+.rpt{font-family:var(--fm);font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rpt::after{content:'';flex:1;height:1px;background:var(--br)}
+.rpsec{margin-bottom:22px}
+.livebadge{display:inline-flex;align-items:center;gap:4px;font-family:var(--fm);font-size:9px;font-weight:600;color:var(--r);background:var(--rd);border:1px solid var(--rb);padding:2px 7px;border-radius:3px}
+.livedot{width:5px;height:5px;background:var(--r);border-radius:50%;animation:bk 1s ease-in-out infinite}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:0}}
+.trending-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--bgc);border:1px solid var(--br);border-radius:16px;cursor:pointer;margin:3px;transition:all .15s;font-size:11px}
+.trending-tag:hover{border-color:var(--bra);background:var(--bgh)}
+.tt-sym{font-family:var(--fm);font-size:10px;font-weight:600;color:var(--b)}
+.tt-count{font-family:var(--fm);font-size:9px;color:var(--t3)}
+.top-contrib{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)}
+.top-contrib:last-child{border-bottom:none}
+.tc-rank{font-family:var(--fm);font-size:12px;font-weight:700;color:var(--t3);width:18px}
+.tc-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;font-weight:600;flex-shrink:0}
+.tc-info{flex:1}
+.tc-name{font-size:12px;font-weight:500}
+.tc-score{font-family:var(--fm);font-size:10px;color:var(--t3)}
+.tc-badge{font-family:var(--fm);font-size:8px;padding:1px 5px;border-radius:3px;border:1px solid}
+.rules-list{padding:0}
+.rule-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--br);font-size:11px;color:var(--t2)}
+.rule-num{font-family:var(--fm);font-size:10px;font-weight:600;color:var(--b);flex-shrink:0;width:18px}
+
+/* ─── MOBILE ─── */
+@media(max-width:1200px){.rpanel{display:none}.main{margin-right:0}}
+@media(max-width:800px){.sidebar{display:none}.main{margin-left:0;padding:12px}}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="tkbar">
+  <div class="tklbl">NSE LIVE</div>
+  <div style="overflow:hidden;flex:1"><div class="tkscroll" id="tk"></div></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="logo" href="index.html"><div class="ldot"></div>StockPulse</a>
+  <div class="bcrumb">
+    <a href="index.html">Dashboard</a>
+    <span>/</span><strong>Community Forum</strong>
+  </div>
+  <div class="nr">
+    <div class="ibtn" title="Notifications">🔔<div class="ndot"></div></div>
+    <div class="ibtn" title="Settings">⚙</div>
+    <button class="pbtn" onclick="showAuthPrompt()">Sign In</button>
+    <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;font-weight:600;color:#fff;cursor:pointer;border:1.5px solid var(--bra)">SP</div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="ssec">
+    <div class="slbl">Main</div>
+    <a class="ni" href="index.html"><span class="nico">▦</span>Dashboard</a>
+    <a class="ni" href="stock-detail.html"><span class="nico">◈</span>Markets</a>
+    <a class="ni" href="news-feed.html"><span class="nico">◷</span>News Feed</a>
+    <a class="ni" href="#"><span class="nico">⊞</span>Screener</a>
+  </div>
+  <div class="ssec">
+    <div class="slbl">Community</div>
+    <div class="ni act"><span class="nico">◉</span>All Posts<span class="nbadge" style="background:var(--r);color:#fff">247</span></div>
+    <div class="ni" onclick="filterByCategory('analysis')"><span class="nico" style="color:var(--b)">●</span>Analysis</div>
+    <div class="ni" onclick="filterByCategory('technical')"><span class="nico" style="color:var(--g)">●</span>Technical</div>
+    <div class="ni" onclick="filterByCategory('macro')"><span class="nico" style="color:var(--am)">●</span>Macro & Economy</div>
+    <div class="ni" onclick="filterByCategory('ipo')"><span class="nico" style="color:var(--pu)">●</span>IPO Watch</div>
+    <div class="ni" onclick="filterByCategory('results')"><span class="nico" style="color:var(--cy)">●</span>Results & Earnings</div>
+    <div class="ni" onclick="filterByCategory('beginner')"><span class="nico" style="color:var(--pi)">●</span>Beginner Q&A</div>
+  </div>
+  <div class="ssec">
+    <div class="slbl">My Activity</div>
+    <div class="ni"><span class="nico">◎</span>My Posts<span class="nbadge" style="background:var(--bg3);color:var(--t2)">12</span></div>
+    <div class="ni"><span class="nico">◷</span>Saved Posts<span class="nbadge" style="background:var(--bg3);color:var(--t2)">8</span></div>
+    <div class="ni"><span class="nico">⚡</span>Notifications<span class="nbadge" style="background:var(--r);color:#fff">5</span></div>
+  </div>
+  <div class="ssec">
+    <div class="slbl">Moderation</div>
+    <div class="ni" onclick="showModPanel()"><span class="nico" style="color:var(--r)">⚑</span>Mod Queue<span class="nbadge" style="background:var(--r);color:#fff">7</span></div>
+    <div class="ni"><span class="nico">⚙</span>Mod Settings</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- Forum header -->
+  <div class="forum-hdr">
+    <div class="fh-top">
+      <div>
+        <div class="fh-title">StockPulse Community</div>
+        <div class="fh-sub">Discuss stocks, share analysis, and learn from fellow traders</div>
+      </div>
+      <div class="fh-stats">
+        <div class="fhs"><div class="fhs-val">48,291</div><div class="fhs-lbl">Members</div></div>
+        <div class="fhs"><div class="fhs-val" style="color:var(--g)">2,847</div><div class="fhs-lbl">Online Now</div></div>
+        <div class="fhs"><div class="fhs-val">1.2M</div><div class="fhs-lbl">Total Posts</div></div>
+        <div class="fhs"><div class="fhs-val">24/7</div><div class="fhs-lbl">Active</div></div>
+      </div>
+    </div>
+    <div class="fh-actions">
+      <div class="livebadge"><div class="livedot"></div>LIVE</div>
+      <span style="font-size:11px;color:var(--t3)">247 new posts today · 5 trending discussions</span>
+      <button onclick="scrollToCompose()" style="background:var(--b);color:#fff;border:none;border-radius:6px;padding:7px 18px;font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;margin-left:auto">✎ New Post</button>
+    </div>
+  </div>
+
+  <!-- Composer -->
+  <div class="composer" id="composer">
+    <div class="composer-tabs">
+      <div class="ctab act" onclick="switchComposerTab('post',this)">Post</div>
+      <div class="ctab" onclick="switchComposerTab('analysis',this)">Analysis</div>
+      <div class="ctab" onclick="switchComposerTab('poll',this)">Poll</div>
+    </div>
+    <div class="composer-body" id="composerBody">
+      <div class="composer-row">
+        <div class="cavatar">SP</div>
+        <div style="flex:1">
+          <input class="ctitle-input" id="postTitle" placeholder="Post title — be specific and descriptive…" maxlength="200" oninput="updateCharCount()">
+          <textarea class="cbody-input" id="postBody" placeholder="Share your analysis, trade idea, question, or insight…" oninput="updateCharCount()"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="composer-footer">
+      <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">#</span>
+      <div class="tag-input-wrap">
+        <div class="added-tags" id="addedTags"></div>
+        <input class="tag-input" id="tagInput" placeholder="Add stock tags (RELIANCE, TCS…)" onkeydown="handleTagInput(event)">
+      </div>
+      <div class="filter-divider" style="width:1px;height:20px;background:var(--br)"></div>
+      <div class="sent-btns">
+        <div class="sbtn sbtn-bull sel" id="sbull" onclick="selectSent('bullish')">▲ Bull</div>
+        <div class="sbtn sbtn-neut" id="sneut" onclick="selectSent('neutral')">— Neut</div>
+        <div class="sbtn sbtn-bear" id="sbear" onclick="selectSent('bearish')">▼ Bear</div>
+      </div>
+      <span class="char-count" id="charCount">0 / 5000</span>
+      <button class="post-btn" id="postBtn" onclick="submitPost()">Post</button>
+    </div>
+  </div>
+
+  <!-- Sort bar -->
+  <div class="sort-bar">
+    <div class="sort-tabs">
+      <div class="stab act" onclick="setSort('hot',this)">🔥 Hot</div>
+      <div class="stab" onclick="setSort('new',this)">🆕 New</div>
+      <div class="stab" onclick="setSort('top',this)">⬆ Top</div>
+      <div class="stab" onclick="setSort('rising',this)">📈 Rising</div>
+    </div>
+    <div id="activeFilters"></div>
+    <span class="post-count" id="postCount">Loading posts…</span>
+  </div>
+
+  <!-- Posts list -->
+  <div id="postsContainer"></div>
+
+  <!-- Pagination -->
+  <div id="loadMoreWrap" style="text-align:center;padding:16px 0">
+    <button onclick="loadMorePosts()" style="background:var(--bgc);border:1px solid var(--br);border-radius:8px;padding:10px 32px;color:var(--t2);font-family:var(--fm);font-size:11px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--bra)'" onmouseout="this.style.borderColor='var(--br)'">↓ Load more posts</button>
+  </div>
+
+</main>
+
+<!-- RIGHT PANEL -->
+<aside class="rpanel">
+  <div class="rpsec">
+    <div class="rpt">Trending Stocks</div>
+    <div id="trendingTags"></div>
+  </div>
+  <div class="rpsec">
+    <div class="rpt">Top Contributors</div>
+    <div id="topContribs"></div>
+  </div>
+  <div class="rpsec">
+    <div class="rpt">Community Stats</div>
+    <div id="communityStats"></div>
+  </div>
+  <div class="rpsec">
+    <div class="rpt">Forum Rules</div>
+    <div id="forumRules"></div>
+  </div>
+</aside>
+</div>
+
+<!-- POST DETAIL MODAL -->
+<div id="postModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;overflow-y:auto;padding:30px 20px" onclick="closeModalBg(event)">
+  <div style="max-width:820px;margin:0 auto" id="postModalContent"></div>
+</div>
+
+<!-- MOD PANEL MODAL -->
+<div id="modModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:200;overflow-y:auto;padding:30px 20px" onclick="if(event.target===this)closeModModal()">
+  <div style="max-width:700px;margin:0 auto" id="modModalContent"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════
+
+const AVATAR_COLORS=['#3b82f6','#8b5cf6','#00d68f','#f59e0b','#ff4d6d','#06b6d4','#ec4899'];
+function avatarColor(n){let h=0;for(const c of n)h=c.charCodeAt(0)+((h<<5)-h);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length]}
+function initials(n){return(n||'U').slice(0,2).toUpperCase()}
+
+const STOCK_COLORS={RELIANCE:'#3b82f6',WIPRO:'#00d68f',TCS:'#8b5cf6',INFY:'#f59e0b',HDFCBANK:'#ff4d6d',ADANIENT:'#ef4444',SBIN:'#06b6d4',MARUTI:'#ec4899',default:'#8b9ab0'};
+function stockColor(s){return STOCK_COLORS[s]||STOCK_COLORS.default}
+
+const POSTS=[
+  {
+    id:1,title:'Wipro Q4 Analysis: Why the 4-6% guidance is more significant than it looks',
+    body:`I've been tracking Wipro for 3 years and this is genuinely the first time management has guided at the upper end of their comfort zone.\n\nHere's why this matters:\n\n**1. Deal TCV at $1.7B** - That's a 55% jump from $1.1B in Q3. Large deals have a 4-6 quarter revenue ramp, so we're looking at FY26 visibility improving significantly.\n\n**2. BFSI recovery is real** - After 18 months of weakness, BFSI (which is 28% of revenue) grew 2.3% QoQ. This is the most important leading indicator for the entire IT sector.\n\n**3. Margin levers are intact** - Even after wage hikes, EBIT margin was flat at 17.5%. Utilization at 83% gives headroom to absorb growth without incremental hires.\n\nMy target: ₹520 in 3 months. Risk: global slowdown or USD strengthening.`,
+    author:'TradingTiger92',badge:'Premium',badgeColor:'var(--am)',badgeBg:'var(--amd)',badgeBC:'var(--amb)',
+    time:'2h ago',ts:new Date(Date.now()-2*3600000),
+    votes:347,userVote:null,comments:58,views:2847,
+    stocks:['WIPRO','INFY','HCLTECH'],tags:['Q4Results','IT','FundamentalAnalysis','LargeCap'],
+    sentiment:'bullish',sentScore:84,category:'analysis',pinned:true,
+    awards:['⭐ Quality Analysis','💡 Insightful'],
+  },
+  {
+    id:2,title:'Technical setup: NIFTY likely to test 23,200 by month-end — here\'s my case',
+    body:`Looking at the weekly chart, NIFTY has formed a cup and handle pattern on the weekly timeframe. RSI at 61 (not overbought), MACD gave a fresh bull cross last Thursday.\n\nKey levels:\n- Immediate resistance: 23,000 (psychological + 52W high)\n- Target 1: 23,200 (1.618 Fibonacci extension)\n- Target 2: 23,650 (if 23,200 breaks)\n- Stop loss: 22,400 (below 20 EMA on daily)\n\nVolume analysis: The past 5 sessions have seen above-average buying volume on up days and below-average on down days — classic accumulation pattern.\n\nBias: Bullish, but wait for a close above 22,900 to confirm.`,
+    author:'NiftySage',badge:'Analyst',badgeColor:'var(--g)',badgeBg:'var(--gd)',badgeBC:'var(--gb)',
+    time:'4h ago',ts:new Date(Date.now()-4*3600000),
+    votes:224,userVote:null,comments:41,views:1923,
+    stocks:['NIFTY50','BANKNIFTY'],tags:['Technical','CupAndHandle','NIFTY','Positional'],
+    sentiment:'bullish',sentScore:77,category:'technical',pinned:false,
+  },
+  {
+    id:3,title:'HDFC Bank NIM contraction — is the worst over or is there more pain ahead?',
+    body:`HDFC Bank reported NIM at 3.44% vs my estimate of 3.52%. Management guided for 3.5-3.6% by Q2 FY26, which is ~2 quarters away. The question is whether to hold or book losses now.\n\nBear case:\n- Deposit mobilization still lagging the merged entity's needs\n- Stress in small business book (₹4,200 Cr provisions)\n- FII selling continues (down 1.2% last quarter)\n\nBull case:\n- Valuation now at 2.1x P/B vs historical 3.5x\n- Credit growth reaccelerating at 14% YoY\n- Management has delivered on integration milestones so far\n\nI'm neutral — waiting for a clear NIM recovery signal before adding.`,
+    author:'ValueHunter_IN',badge:'',badgeColor:'',badgeBg:'',badgeBC:'',
+    time:'6h ago',ts:new Date(Date.now()-6*3600000),
+    votes:189,userVote:null,comments:67,views:3241,
+    stocks:['HDFCBANK','KOTAKBANK','ICICIBANK'],tags:['HDFCBANK','Q4Results','NIM','Banking'],
+    sentiment:'neutral',sentScore:46,category:'analysis',pinned:false,
+  },
+  {
+    id:4,title:'Should beginners buy index ETFs or individual stocks? My honest take after 5 years',
+    body:`I started stock picking in 2019. Made good returns in 2020-21 bull market, gave most back in 2022. Now 80% index, 20% stocks. Here's what I learned:\n\n1. Index ETFs (NIFTYBEES, JUNIORBEES) beat most active fund managers over 10 years\n2. Stock picking requires hours of research — do you have that time?\n3. If you want to pick stocks, focus on quality businesses (high ROCE > 15%, low debt, consistent growth)\n4. Never invest money you can't afford to lose for 5+ years\n5. Ignore short-term noise — the 5-year chart always looks better\n\nMy SIP approach: ₹20,000/month into NIFTYBEES, ₹10,000 for stock ideas.`,
+    author:'LongTermLearner',badge:'Veteran',badgeColor:'var(--cy)',badgeBg:'var(--cyd)',badgeBC:'var(--cyb)',
+    time:'1d ago',ts:new Date(Date.now()-24*3600000),
+    votes:512,userVote:null,comments:94,views:8241,
+    stocks:['NIFTYBEES','JUNIORBEES'],tags:['Investing','Beginner','ETF','SIP','LongTerm'],
+    sentiment:'neutral',sentScore:55,category:'beginner',pinned:false,
+    awards:['🏆 Community Favorite'],
+  },
+  {
+    id:5,title:'Adani Group — still worth holding after DOJ news? Risk-reward analysis',
+    body:`I hold Adani Enterprises at avg ₹2,400. Down ~12% from my entry. Trying to decide whether to cut or hold.\n\nThe DOJ subpoena is serious but not a conviction. Historical precedents:\n- Vedanta faced similar scrutiny — resolved in 18 months, stock recovered\n- Satyam (extreme case) — total loss\n\nAdani's businesses (ports, airports, transmission) are regulated monopolies that India cannot afford to shut down. The operational performance is strong — Adani Ports Q4 revenue +18% YoY.\n\nMy decision: Hold 50%, sell 50% to reduce risk. Not adding till legal clarity.`,
+    author:'RiskManager_Pro',badge:'',badgeColor:'',badgeBg:'',badgeBC:'',
+    time:'8h ago',ts:new Date(Date.now()-8*3600000),
+    votes:156,userVote:null,comments:83,views:5102,
+    stocks:['ADANIENT','ADANIPORTS','ADANIGREEN'],tags:['Adani','DOJ','RiskManagement','Fundamentals'],
+    sentiment:'neutral',sentScore:42,category:'analysis',pinned:false,
+  },
+  {
+    id:6,title:'IPO Watch: Upcoming listings in May — quick notes on each',
+    body:`May is packed with IPOs. Quick take on each:\n\n**1. HDB Financial Services** — HDFC Bank subsidiary, strong brand. Premium valuation at 3.8x P/B vs peers at 2.5x. Subscribe for listing gains only.\n\n**2. Ather Energy** — EV scooter maker, burning cash but strong brand. Speculative; avoid unless you have risk appetite.\n\n**3. NSDL** — Depositories are near-monopoly businesses. Strong cash flows. Subscribe for long-term.\n\n**4. Standard Glass Lining** — Niche pharma equipment maker. High ROE (28%), reasonable valuations. Subscribe with 3-year horizon.\n\nGMP updates will be posted in comments.`,
+    author:'IPOWatcher',badge:'Premium',badgeColor:'var(--am)',badgeBg:'var(--amd)',badgeBC:'var(--amb)',
+    time:'12h ago',ts:new Date(Date.now()-12*3600000),
+    votes:278,userVote:null,comments:45,views:4127,
+    stocks:['HDFCBANK'],tags:['IPO','Upcoming','GMP','HDBFinancial','AtherEnergy'],
+    sentiment:'neutral',sentScore:60,category:'ipo',pinned:false,
+    awards:['💡 Insightful'],
+  },
+];
+
+const COMMENTS={
+  1:[
+    {id:'c1',author:'InstitutionalEye',badge:'Verified',badgeColor:'var(--b)',badgeBg:'var(--bd)',badgeBC:'var(--bbr)',time:'1h ago',ts:new Date(Date.now()-3600000),text:'Agree on the BFSI point. The recovery in this vertical is more important than headline revenue growth. When BFSI comes back, Indian IT companies see 200-300 bps margin expansion on better pricing power.',votes:89,userVote:null,replies:[
+      {id:'c1r1',author:'TradingTiger92',badge:'Premium',badgeColor:'var(--am)',badgeBg:'var(--amd)',badgeBC:'var(--amb)',time:'45m ago',ts:new Date(Date.now()-45*60000),text:'Exactly. And the deal TCV data is the strongest leading indicator — revenue from Q3 deal wins will show up in Q1/Q2 FY26.',votes:42,userVote:null},
+    ]},
+    {id:'c2',author:'SkepticalTrader',badge:'',badgeColor:'',badgeBg:'',badgeBC:'',time:'1.5h ago',ts:new Date(Date.now()-90*60000),text:'I\'d be cautious on the guidance upgrade thesis. Wipro has missed guidance 3 out of the last 5 quarters. The 4-6% range is wide and the lower end would be a disappointment at current valuations.',votes:34,userVote:null,replies:[]},
+    {id:'c3',author:'NiftySage',badge:'Analyst',badgeColor:'var(--g)',badgeBg:'var(--gd)',badgeBC:'var(--gb)',time:'2h ago',ts:new Date(Date.now()-120*60000),text:'Good analysis. From a technical standpoint, WIPRO\'s chart also looks constructive — trading above 20 and 50 DMA, RSI at 62. The 52-week high at ₹520 is the next major resistance.',votes:61,userVote:null,replies:[]},
+  ],
+};
+
+const MOD_QUEUE=[
+  {id:'m1',type:'spam',text:'AMAZING RETURNS GUARANTEED!! WhatsApp +91-XXXXXX for daily tips 500% profit',user:'suspicious_user_99',score:97,time:'5m ago'},
+  {id:'m2',type:'hate',text:'All Adani investors are idiots who deserve to lose money. Complete morons.',user:'angrytroll_44',score:82,time:'18m ago'},
+  {id:'m3',type:'report',text:'This seems like a pump and dump post for a small cap stock. The claims seem unverifiable.',user:'reporter_verified',score:45,time:'32m ago'},
+  {id:'m4',type:'spam',text:'FREE DEMAT ACCOUNT! Click here for ₹500 bonus. Refer and earn ₹1000 per friend.',user:'affiliate_bot',score:91,time:'44m ago'},
+  {id:'m5',type:'report',text:'Post contains personal information about another user including phone number.',user:'privacy_guard',score:70,time:'1h ago'},
+  {id:'m6',type:'hate',text:'People who invest in PSU banks are economically illiterate. Stop wasting money.',user:'crypto_evangelist',score:58,time:'2h ago'},
+  {id:'m7',type:'report',text:'This post\'s technical analysis appears to be copied verbatim from a paid newsletter.',user:'original_author',score:65,time:'3h ago'},
+];
+
+const TICKER_DATA=[
+  {s:'NIFTY50',p:22847.6,c:+1.24},{s:'SENSEX',p:75341.2,c:+1.18},{s:'WIPRO',p:487.3,c:+4.61},
+  {s:'RELIANCE',p:2847.5,c:+1.22},{s:'TCS',p:4021.3,c:+0.87},{s:'INFY',p:1889.2,c:+3.42},
+  {s:'HDFCBANK',p:1612.4,c:-1.93},{s:'ADANIENT',p:2741.8,c:-3.14},{s:'MARUTI',p:12480.5,c:+2.84},
+];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+
+let currentSort='hot';
+let currentCategory='all';
+let selectedSentiment='bullish';
+let addedTags=[];
+let displayedPosts=[...POSTS];
+
+// ══════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════
+
+function renderTicker(){
+  const items=[...TICKER_DATA,...TICKER_DATA];
+  document.getElementById('tk').innerHTML=items.map(d=>`
+    <div class="tki"><span class="tksym">${d.s}</span>
+    <span class="tkprc">₹${d.p.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+    <span class="tkchg ${d.c>0?'up':'down'}">${d.c>0?'+':''}${d.c.toFixed(2)}%</span></div>`).join('');
+}
+
+function renderPosts(posts){
+  document.getElementById('postCount').textContent=`${posts.length} posts`;
+  document.getElementById('postsContainer').innerHTML=posts.map(p=>buildPostCard(p)).join('');
+}
+
+function buildPostCard(p){
+  const vc=p.votes>0?'pos':p.votes<0?'neg':'zero';
+  const avatarC=avatarColor(p.author);
+  const sentCls=p.sentiment==='bullish'?'sb-bull':p.sentiment==='bearish'?'sb-bear':'sb-neut';
+  const sentTxt=p.sentiment==='bullish'?'▲ Bullish':p.sentiment==='bearish'?'▼ Bearish':'— Neutral';
+
+  return `<div class="post-card ${p.pinned?'pinned':''}" id="post-${p.id}">
+    <div class="vote-col">
+      <div class="vote-btn ${p.userVote==='up'?'voted-up':''}" onclick="event.stopPropagation();vote(${p.id},'up')">▲</div>
+      <div class="vote-score ${vc}">${p.votes}</div>
+      <div class="vote-btn ${p.userVote==='down'?'voted-down':''}" onclick="event.stopPropagation();vote(${p.id},'down')">▼</div>
+    </div>
+    <div class="post-body-wrap" onclick="openPost(${p.id})">
+      <div class="post-top">
+        <div class="post-avatar" style="background:${avatarC}22;color:${avatarC};border:1px solid ${avatarC}44">${initials(p.author)}</div>
+        <span class="post-user">${p.author}</span>
+        ${p.badge?`<span class="user-badge" style="color:${p.badgeColor};background:${p.badgeBg};border-color:${p.badgeBC}">${p.badge}</span>`:''}
+        <span class="post-time">${p.time}</span>
+        ${p.pinned?'<span class="pinned-flag">📌 Pinned</span>':''}
+        ${(p.awards||[]).map(a=>`<span style="font-size:10px">${a}</span>`).join('')}
+      </div>
+      <div class="post-title">${p.title}</div>
+      <div class="post-preview">${p.body.replace(/\*\*/g,'').split('\n')[0]}</div>
+      <div class="post-tags-row">
+        ${p.stocks.map(s=>`<span class="stock-tag" onclick="event.stopPropagation();filterByStock('${s}')" style="color:${stockColor(s)};background:${stockColor(s)}18;border-color:${stockColor(s)}44">${s}</span>`).join('')}
+        ${p.tags.slice(0,3).map(t=>`<span class="hash-tag" onclick="event.stopPropagation()">#${t}</span>`).join('')}
+      </div>
+      <div class="post-footer">
+        <div class="pf-btn" onclick="event.stopPropagation();openPost(${p.id})">💬 ${p.comments} comments</div>
+        <div class="pf-btn" onclick="event.stopPropagation()">↗ Share</div>
+        <div class="pf-btn" onclick="event.stopPropagation()">⚑ Report</div>
+        <div class="pf-btn" onclick="event.stopPropagation()">👁 ${p.views.toLocaleString()}</div>
+        ${p.awards?.length?`<div class="pf-btn pf-award" onclick="event.stopPropagation()">🏆 Awarded</div>`:''}
+        <div class="sent-badge ${sentCls}">${sentTxt}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderRightPanel(){
+  // Trending tags
+  const tags=[
+    {s:'WIPRO',count:1842},{s:'NIFTY50',count:1421},{s:'HDFCBANK',count:1124},
+    {s:'ADANIENT',count:987},{s:'RELIANCE',count:864},{s:'INFY',count:741},
+    {s:'TCS',count:621},{s:'MARUTI',count:512},{s:'SBIN',count:448},
+  ];
+  document.getElementById('trendingTags').innerHTML=tags.map(t=>`
+    <div class="trending-tag" onclick="filterByStock('${t.s}')">
+      <span class="tt-sym">${t.s}</span>
+      <span class="tt-count">${t.count.toLocaleString()}</span>
+    </div>`).join('');
+
+  // Top contributors
+  const contribs=[
+    {name:'TradingTiger92',score:14820,badge:'Premium',bc:'var(--am)',bg:'var(--amd)',bbc:'var(--amb)'},
+    {name:'InstitutionalEye',score:12341,badge:'Verified',bc:'var(--b)',bg:'var(--bd)',bbc:'var(--bbr)'},
+    {name:'NiftySage',score:9872,badge:'Analyst',bc:'var(--g)',bg:'var(--gd)',bbc:'var(--gb)'},
+    {name:'LongTermLearner',score:8214,badge:'Veteran',bc:'var(--cy)',bg:'var(--cyd)',bbc:'var(--cyb)'},
+    {name:'ValueHunter_IN',score:7103,badge:'',bc:'',bg:'',bbc:''},
+  ];
+  document.getElementById('topContribs').innerHTML=contribs.map((c,i)=>{
+    const ac=avatarColor(c.name);
+    return `<div class="top-contrib">
+      <span class="tc-rank">0${i+1}</span>
+      <div class="tc-avatar" style="background:${ac}22;color:${ac};border:1px solid ${ac}44">${initials(c.name)}</div>
+      <div class="tc-info">
+        <div class="tc-name">${c.name} ${c.badge?`<span class="tc-badge" style="color:${c.bc};background:${c.bg};border-color:${c.bbc}">${c.badge}</span>`:''}</div>
+        <div class="tc-score">${c.score.toLocaleString()} karma</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Community stats
+  document.getElementById('communityStats').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${[
+        {l:'Posts Today',v:'247',c:'var(--b)'},
+        {l:'Comments Today',v:'1,842',c:'var(--g)'},
+        {l:'New Members',v:'38',c:'var(--pu)'},
+        {l:'Avg. Karma',v:'1,240',c:'var(--am)'},
+      ].map(s=>`<div style="background:var(--bgc);border:1px solid var(--br);border-radius:6px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:3px">${s.l}</div>
+        <div style="font-family:var(--fm);font-size:16px;font-weight:600;color:${s.c}">${s.v}</div>
+      </div>`).join('')}
+    </div>`;
+
+  // Forum rules
+  const rules=['Be respectful — no personal attacks','No spam or self-promotion','Cite your sources','No pump-and-dump schemes','SEBI disclaimer on trade advice','Verify before you post'];
+  document.getElementById('forumRules').innerHTML=`<div class="rules-list">${rules.map((r,i)=>`
+    <div class="rule-item"><span class="rule-num">${i+1}.</span><span>${r}</span></div>`).join('')}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// POST DETAIL MODAL
+// ══════════════════════════════════════════════════════════
+
+function openPost(id){
+  const p=POSTS.find(x=>x.id===id);
+  if(!p) return;
+  const comments=COMMENTS[id]||[];
+  const avatarC=avatarColor(p.author);
+  const sentCls=p.sentiment==='bullish'?'sb-bull':p.sentiment==='bearish'?'sb-bear':'sb-neut';
+  const sentTxt=p.sentiment==='bullish'?'▲ Bullish':p.sentiment==='bearish'?'▼ Bearish':'— Neutral';
+
+  document.getElementById('postModalContent').innerHTML=`
+    <div class="post-detail">
+      <div class="pd-header">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <div class="post-avatar" style="width:28px;height:28px;background:${avatarC}22;color:${avatarC};border:1px solid ${avatarC}44">${initials(p.author)}</div>
+          <span style="font-size:12px;font-weight:500">${p.author}</span>
+          ${p.badge?`<span class="user-badge" style="color:${p.badgeColor};background:${p.badgeBg};border-color:${p.badgeBC}">${p.badge}</span>`:''}
+          <span style="font-family:var(--fm);font-size:10px;color:var(--t3)">${p.time}</span>
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <span class="sent-badge ${sentCls}">${sentTxt}</span>
+            <button onclick="closeModal()" style="width:28px;height:28px;background:var(--bg3);border:1px solid var(--br);border-radius:5px;color:var(--t2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">✕</button>
+          </div>
+        </div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px">${p.title}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${p.stocks.map(s=>`<span class="stock-tag" style="color:${stockColor(s)};background:${stockColor(s)}18;border-color:${stockColor(s)}44">${s}</span>`).join('')}
+          ${p.tags.map(t=>`<span class="hash-tag">#${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="pd-body">${formatBody(p.body)}</div>
+      <div class="pd-actions">
+        <div class="pf-btn ${p.userVote==='up'?'active-reply':''}" onclick="vote(${p.id},'up')">▲ ${p.votes} votes</div>
+        <div class="pf-btn">💬 ${p.comments} comments</div>
+        <div class="pf-btn">↗ Share</div>
+        <div class="pf-btn">⚑ Report</div>
+        <div class="pf-btn pf-award">${(p.awards||[]).join(' ')}</div>
+      </div>
+
+      <!-- Comments -->
+      <div class="comments-area">
+        <div class="comments-header">
+          <div class="comments-count">💬 ${comments.length} Comments</div>
+          <div class="comment-sort">
+            <div class="csort-btn act">Best</div>
+            <div class="csort-btn">New</div>
+            <div class="csort-btn">Top</div>
+          </div>
+        </div>
+
+        <!-- Reply composer -->
+        <div class="reply-composer">
+          <textarea class="reply-input" placeholder="Add a comment — be specific, cite sources…" id="mainReply"></textarea>
+          <div class="reply-footer">
+            <div class="fmt-btns">
+              <div class="fmt-btn" title="Bold"><b>B</b></div>
+              <div class="fmt-btn" title="Italic"><i>I</i></div>
+              <div class="fmt-btn" title="Code">{ }</div>
+            </div>
+            <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">Markdown supported</span>
+            <span class="cancel-btn" onclick="document.getElementById('mainReply').value=''">Clear</span>
+            <button class="reply-btn" onclick="submitComment(${p.id})">Comment</button>
+          </div>
+        </div>
+
+        <!-- Thread -->
+        ${comments.map(c=>buildComment(c,true)).join('')}
+        ${comments.length===0?`<div style="text-align:center;padding:32px;color:var(--t3);font-family:var(--fm);font-size:11px">No comments yet — be the first!</div>`:''}
+      </div>
+    </div>`;
+
+  document.getElementById('postModal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+
+function buildComment(c,showReplies=false){
+  const ac=avatarColor(c.author);
+  return `
+    <div class="comment" id="comment-${c.id}">
+      <div class="comment-row">
+        <div class="comment-avatar" style="background:${ac}22;color:${ac};border:1px solid ${ac}44">${initials(c.author)}</div>
+        <div class="comment-content">
+          <div class="comment-meta">
+            <span class="c-user">${c.author}</span>
+            ${c.badge?`<span class="c-badge" style="color:${c.badgeColor};background:${c.badgeBg};border-color:${c.badgeBC}">${c.badge}</span>`:''}
+            <span class="c-time">${c.time}</span>
+          </div>
+          <div class="comment-text">${c.text}</div>
+          <div class="comment-actions">
+            <div class="ca-btn ${c.userVote==='up'?'voted':''}" onclick="voteComment('${c.id}','up')">▲ ${c.votes}</div>
+            <div class="ca-btn ${c.userVote==='down'?'downvoted':''}" onclick="voteComment('${c.id}','down')">▼</div>
+            <div class="ca-btn" onclick="toggleReplyBox('${c.id}')">↩ Reply</div>
+            <div class="ca-btn">↗ Share</div>
+            <div class="ca-btn">⚑</div>
+          </div>
+          <div id="reply-box-${c.id}" style="display:none;margin-top:8px">
+            <textarea style="width:100%;background:var(--bgc);border:1px solid var(--br);border-radius:5px;padding:7px 10px;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none;resize:vertical;min-height:56px" placeholder="Reply to ${c.author}…"></textarea>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button class="reply-btn" style="font-size:11px;padding:5px 14px" onclick="submitReply('${c.id}')">Reply</button>
+              <span class="cancel-btn" onclick="toggleReplyBox('${c.id}')">Cancel</span>
+            </div>
+          </div>
+          ${showReplies&&c.replies?.length?`
+            <div class="nested-replies">
+              ${c.replies.map(r=>buildComment(r,false)).join('')}
+            </div>`:''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function formatBody(text){
+  return text
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .split('\n')
+    .map(line=>line.trim()?`<p>${line}</p>`:'')
+    .join('');
+}
+
+function closeModal(){
+  document.getElementById('postModal').style.display='none';
+  document.body.style.overflow='';
+}
+
+function closeModalBg(e){
+  if(e.target===document.getElementById('postModal'))closeModal();
+}
+
+// ══════════════════════════════════════════════════════════
+// MODERATION PANEL
+// ══════════════════════════════════════════════════════════
+
+function showModPanel(){
+  const typeLabel={spam:'🤖 Spam',hate:'⚠ Hate Speech',report:'🚩 Reported'};
+  const typeCls={spam:'mt-spam',hate:'mt-hate',report:'mt-report'};
+  const spamColor=s=>s>=80?'var(--r)':s>=50?'var(--am)':'var(--g)';
+
+  document.getElementById('modModalContent').innerHTML=`
+    <div class="mod-panel">
+      <div class="mod-header">
+        <span style="font-size:16px">⚑</span>
+        <div class="mod-title">Moderation Queue</div>
+        <div class="mod-badge">${MOD_QUEUE.length} pending</div>
+        <button onclick="closeModModal()" style="margin-left:auto;width:28px;height:28px;background:var(--rd);border:1px solid var(--rb);border-radius:5px;color:var(--r);cursor:pointer;font-size:14px">✕</button>
+      </div>
+
+      <div style="padding:12px 16px;border-bottom:1px solid var(--br);background:var(--bg3);display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--t2)">Filter:</span>
+        ${['All','Spam','Hate Speech','Reported'].map(f=>`<div class="chip" style="padding:3px 10px;border-radius:12px;font-size:11px;border:1px solid var(--br);cursor:pointer;color:var(--t2);background:transparent" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.style.background='transparent');this.style.background='var(--bg2)'">${f}</div>`).join('')}
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button onclick="approveAll()" style="background:var(--gd);color:var(--g);border:1px solid var(--gb);border-radius:5px;padding:5px 14px;font-family:var(--fm);font-size:10px;cursor:pointer;font-weight:600">✓ Keep All Safe</button>
+          <button onclick="removeAll()" style="background:var(--rd);color:var(--r);border:1px solid var(--rb);border-radius:5px;padding:5px 14px;font-family:var(--fm);font-size:10px;cursor:pointer;font-weight:600">✕ Remove All Flagged</button>
+        </div>
+      </div>
+
+      ${MOD_QUEUE.map(item=>`
+        <div class="mod-item" id="mod-${item.id}">
+          <div class="mod-type ${typeCls[item.type]}">${typeLabel[item.type]}</div>
+          <div class="mod-content">
+            <div class="mod-text">"${item.text}"</div>
+            <div class="mod-meta">
+              <span>by ${item.user}</span><span>·</span><span>${item.time}</span>
+              <span>·</span>
+              <div class="spam-score">
+                <span>AI Score: ${item.score}/100</span>
+                <div class="spam-bar"><div class="spam-fill" style="width:${item.score}%;background:${spamColor(item.score)}"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="mod-actions">
+            <div class="mact mact-remove" onclick="modAction('remove','${item.id}')">✕ Remove</div>
+            <div class="mact mact-keep" onclick="modAction('keep','${item.id}')">✓ Keep</div>
+          </div>
+        </div>`).join('')}
+
+      <div style="padding:14px 16px;border-top:1px solid var(--br);font-family:var(--fm);font-size:10px;color:var(--t3);display:flex;justify-content:space-between">
+        <span>AI spam detection powered by StockPulse NLP · Confidence threshold: 70%</span>
+        <span>Last scan: 2 min ago</span>
+      </div>
+    </div>`;
+
+  document.getElementById('modModal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+
+function closeModModal(){
+  document.getElementById('modModal').style.display='none';
+  document.body.style.overflow='';
+}
+
+function modAction(action,id){
+  const el=document.getElementById(`mod-${id}`);
+  if(!el) return;
+  el.style.opacity='0';
+  el.style.transform='translateX(20px)';
+  el.style.transition='all .3s';
+  setTimeout(()=>el.remove(),300);
+}
+
+function approveAll(){
+  document.querySelectorAll('.mod-item').forEach(el=>{
+    el.style.opacity='0';el.style.transition='all .3s ease';
+    setTimeout(()=>el.remove(),300);
+  });
+}
+function removeAll(){approveAll();}
+
+// ══════════════════════════════════════════════════════════
+// INTERACTIONS
+// ══════════════════════════════════════════════════════════
+
+function vote(postId,dir){
+  const p=POSTS.find(x=>x.id===postId);
+  if(!p) return;
+  if(p.userVote===dir){p.votes+=(dir==='up'?-1:1);p.userVote=null;}
+  else{
+    if(p.userVote)p.votes+=(p.userVote==='up'?-1:1);
+    p.votes+=(dir==='up'?1:-1);
+    p.userVote=dir;
+  }
+  // Update card in list
+  const card=document.getElementById(`post-${postId}`);
+  if(card){
+    const vc=p.votes>0?'pos':p.votes<0?'neg':'zero';
+    const scoreEl=card.querySelector('.vote-score');
+    if(scoreEl){scoreEl.textContent=p.votes;scoreEl.className=`vote-score ${vc}`;}
+    const upBtn=card.querySelector('.vote-btn:first-child');
+    const dnBtn=card.querySelector('.vote-btn:last-child');
+    if(upBtn)upBtn.className=`vote-btn ${p.userVote==='up'?'voted-up':''}`;
+    if(dnBtn)dnBtn.className=`vote-btn ${p.userVote==='down'?'voted-down':''}`;
+  }
+}
+
+function voteComment(cid,dir){
+  // Optimistic update on screen
+  const el=document.getElementById(`comment-${cid}`);
+  if(!el) return;
+  const upBtn=el.querySelector('.ca-btn');
+  if(upBtn) upBtn.classList.toggle('voted',dir==='up');
+}
+
+function toggleReplyBox(cid){
+  const box=document.getElementById(`reply-box-${cid}`);
+  if(box)box.style.display=box.style.display==='none'?'block':'none';
+}
+
+function submitComment(postId){
+  const val=document.getElementById('mainReply')?.value?.trim();
+  if(!val){alert('Please write a comment first.');return;}
+  document.getElementById('mainReply').value='';
+  // In production: POST /api/forum/posts/:id/comments
+  alert('Comment posted! (Auth + WebSocket push in Phase 8)');
+}
+
+function submitReply(cid){
+  alert(`Reply to comment ${cid} posted!`);
+  toggleReplyBox(cid);
+}
+
+function submitPost(){
+  const title=document.getElementById('postTitle').value.trim();
+  const body=document.getElementById('postBody').value.trim();
+  if(!title){alert('Please add a title.');return;}
+  if(!body){alert('Please add some content.');return;}
+  if(addedTags.length===0){alert('Please add at least one stock tag.');return;}
+
+  // Build new post object
+  const newPost={
+    id:POSTS.length+1,title,
+    body,author:'You',badge:'',badgeColor:'',badgeBg:'',badgeBC:'',
+    time:'Just now',ts:new Date(),
+    votes:0,userVote:null,comments:0,views:1,
+    stocks:addedTags.slice(),
+    tags:[],sentiment:selectedSentiment,sentScore:50,
+    category:'analysis',pinned:false,
+  };
+
+  POSTS.unshift(newPost);
+  document.getElementById('postTitle').value='';
+  document.getElementById('postBody').value='';
+  addedTags=[];
+  document.getElementById('addedTags').innerHTML='';
+  document.getElementById('tagInput').value='';
+  updateCharCount();
+  sortAndRender();
+
+  // Flash new post
+  setTimeout(()=>{
+    const el=document.getElementById(`post-${newPost.id}`);
+    if(el){el.classList.add('new-post');el.scrollIntoView({behavior:'smooth',block:'center'});}
+  },50);
+}
+
+function handleTagInput(e){
+  const input=document.getElementById('tagInput');
+  if((e.key==='Enter'||e.key===','||e.key===' ')&&input.value.trim()){
+    e.preventDefault();
+    const tag=input.value.trim().toUpperCase().replace(/[^A-Z0-9&]/g,'').slice(0,10);
+    if(tag&&!addedTags.includes(tag)&&addedTags.length<6){
+      addedTags.push(tag);
+      renderAddedTags();
+    }
+    input.value='';
+  }
+  if(e.key==='Backspace'&&!input.value&&addedTags.length){
+    addedTags.pop();
+    renderAddedTags();
+  }
+}
+
+function renderAddedTags(){
+  document.getElementById('addedTags').innerHTML=addedTags.map(t=>`
+    <span class="atag" onclick="removeTag('${t}')">
+      <span style="color:${stockColor(t)}">${t}</span>
+      <span class="rm">✕</span>
+    </span>`).join('');
+}
+
+function removeTag(t){
+  addedTags=addedTags.filter(x=>x!==t);
+  renderAddedTags();
+}
+
+function selectSent(s){
+  selectedSentiment=s;
+  document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('s'+s.slice(0,4)).classList.add('sel');
+}
+
+function updateCharCount(){
+  const title=document.getElementById('postTitle').value.length;
+  const body=document.getElementById('postBody').value.length;
+  const total=title+body;
+  document.getElementById('charCount').textContent=`${total} / 5000`;
+  document.getElementById('postBtn').disabled=total<10;
+}
+
+function setSort(s,el){
+  currentSort=s;
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('act'));
+  el.classList.add('act');
+  sortAndRender();
+}
+
+function filterByCategory(cat){
+  currentCategory=cat==='all'?'all':cat;
+  sortAndRender();
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+}
+
+function filterByStock(sym){
+  document.getElementById('activeFilters').innerHTML=`
+    <div class="active-filter" onclick="clearFilters()">
+      <span>${sym}</span><span>✕</span>
+    </div>`;
+  const filtered=POSTS.filter(p=>p.stocks.includes(sym));
+  renderPosts(filtered);
+}
+
+function clearFilters(){
+  document.getElementById('activeFilters').innerHTML='';
+  sortAndRender();
+}
+
+function sortAndRender(){
+  let posts=currentCategory==='all'?[...POSTS]:POSTS.filter(p=>p.category===currentCategory);
+  const sorters={
+    hot:(a,b)=>((b.votes*2+b.comments*1.5+b.views*.01)-(a.votes*2+a.comments*1.5+a.views*.01)),
+    new:(a,b)=>b.ts-a.ts,
+    top:(a,b)=>b.votes-a.votes,
+    rising:(a,b)=>((b.votes/Math.max(1,b.comments))-(a.votes/Math.max(1,a.comments))),
+  };
+  posts.sort(sorters[currentSort]||sorters.hot);
+  // Always put pinned first
+  const pinned=posts.filter(p=>p.pinned);
+  const rest=posts.filter(p=>!p.pinned);
+  renderPosts([...pinned,...rest]);
+}
+
+function loadMorePosts(){
+  const btn=event.target;
+  btn.textContent='Loading…';
+  setTimeout(()=>{btn.textContent='✓ All posts loaded';btn.disabled=true;btn.style.opacity='.5';},1000);
+}
+
+function switchComposerTab(tab,el){
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+}
+
+function scrollToCompose(){
+  document.getElementById('composer').scrollIntoView({behavior:'smooth'});
+  document.getElementById('postTitle').focus();
+}
+
+function showAuthPrompt(){
+  alert('Sign in to post, comment, and vote. (Auth system — Phase 5)');
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+
+window.addEventListener('load',()=>{
+  renderTicker();
+  sortAndRender();
+  renderRightPanel();
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){closeModal();closeModModal();}
+  });
+  // Live counter simulation
+  setInterval(()=>{
+    const el=document.querySelector('.fhs-val');
+    if(el){
+      const n=parseInt(el.textContent.replace(',',''));
+      el.textContent=(n+Math.floor(Math.random()*3)).toLocaleString();
+    }
+  },8000);
+});
+</script>
+</body>
+</html>
