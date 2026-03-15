@@ -101,3 +101,111 @@ All sources are cached in Redis (TTL: 15 min for prices, 6 hours for financials)
 | 8 — WebSocket Engine    | ⏳ Queued |
 | 9 — AI Sentiment Module | ⏳ Queued |
 | 10 — Docker + Deploy    | ⏳ Queued |
+
+stockpulse/frontend/
+├── index.html                          ✅ P1 — Live dashboard (open directly)
+├── stock-detail.html                   🆕 P2 — Full stock page (open directly)
+├── package.json
+├── styles/globals.css                  ✅ P1
+├── components/
+│   ├── layout/
+│   │   ├── AppLayout.jsx               ✅ P1
+│   │   └── Sidebar.jsx                 ✅ P1
+│   ├── dashboard/
+│   │   ├── MarketDashboard.jsx         ✅ P1
+│   │   └── CompanyAnalytics.jsx        ✅ P1
+│   ├── charts/
+│   │   └── CandlestickChart.jsx        🆕 P2 — lightweight-charts + RSI/MACD panels
+│   └── stock/
+│       ├── StockDetailPage.jsx         🆕 P2 — Master page component
+│       ├── StockDiscussion.jsx         🆕 P2 — Reddit-style forum per stock
+│       └── (FinancialTabs, PeerComparison, ShareholdingPattern — in HTML)
+├── hooks/
+│   ├── useWebSocket.js                 ✅ P1
+│   └── useStockData.js                 🆕 P2 — SWR hooks for all data
+└── lib/
+    ├── formatters.js                   ✅ P1
+    └── chartHelpers.js                 🆕 P2 — EMA, RSI, MACD, Bollinger, ATR
+
+    stockpulse/frontend/
+├── index.html                           ✅ P1
+├── stock-detail.html                    ✅ P2
+├── news-feed.html                       🆕 P3 ← standalone demo
+├── components/
+│   ├── layout/ …                        ✅ P1
+│   ├── dashboard/ …                     ✅ P1
+│   ├── charts/ …                        ✅ P2
+│   ├── stock/ …                         ✅ P2
+│   └── news/                            🆕 P3
+│       ├── NewsFeed.jsx                 🆕 Master news page
+│       ├── NewsCard.jsx                 🆕 Article card with sentiment
+│       ├── NewsFilters.jsx              🆕 Sector/source/sentiment filters
+│       ├── NewsArticleModal.jsx         🆕 Article detail modal
+│       └── BreakingNewsBanner.jsx       🆕 Top breaking alert strip
+├── hooks/
+│   ├── useWebSocket.js                  ✅ P1
+│   ├── useStockData.js                  ✅ P2
+│   └── useNews.js                       🆕 P3 — news SWR hooks
+└── lib/
+    ├── formatters.js                    ✅ P1
+    ├── chartHelpers.js                  ✅ P2
+    └── newsHelpers.js                   🆕 P3 — RSS parsing, categorization
+
+    stockpulse/frontend/
+├── index.html                           ✅ P1
+├── stock-detail.html                    ✅ P2
+├── news-feed.html                       ✅ P3
+├── forum.html                           🆕 P4 ← standalone demo
+├── components/
+│   ├── layout/ …                        ✅ P1
+│   ├── dashboard/ …                     ✅ P1
+│   ├── charts/ …                        ✅ P2
+│   ├── stock/ …                         ✅ P2
+│   ├── news/ …                          ✅ P3
+│   └── forum/                           🆕 P4
+│       ├── ForumPage.jsx                🆕 Master layout + routing
+│       ├── PostCard.jsx                 🆕 Reddit-style post card
+│       ├── PostComposer.jsx             🆕 Rich post creation form
+│       ├── CommentThread.jsx            🆕 Nested threaded comments
+│       └── ModerationPanel.jsx         🆕 Admin mod queue + spam flags
+├── hooks/
+│   ├── useWebSocket.js                  ✅ P1
+│   ├── useStockData.js                  ✅ P2
+│   ├── useNews.js                       ✅ P3
+│   └── useForum.js                      🆕 P4
+└── lib/
+    ├── formatters.js                    ✅ P1
+    ├── chartHelpers.js                  ✅ P2
+    ├── newsHelpers.js                   ✅ P3
+    └── forumHelpers.js                  🆕 P4
+
+    stockpulse/frontend/
+├── index.html                    ✅ P1
+├── stock-detail.html             ✅ P2
+├── news-feed.html                ✅ P3
+├── forum.html                    ✅ P4
+├── auth.html                     🆕 P5 ← Login/Register standalone
+├── profile.html                  🆕 P5 ← User dashboard standalone
+├── components/
+│   ├── layout/ …                 ✅ P1
+│   ├── dashboard/ …              ✅ P1
+│   ├── charts/ …                 ✅ P2
+│   ├── stock/ …                  ✅ P2
+│   ├── news/ …                   ✅ P3
+│   ├── forum/ …                  ✅ P4
+│   └── auth/                     🆕 P5
+│       ├── LoginForm.jsx          🆕 JWT login + OAuth
+│       ├── RegisterForm.jsx       🆕 Registration + validation
+│       └── ProtectedRoute.jsx     🆕 Route guard HOC
+├── hooks/
+│   ├── useWebSocket.js           ✅ P1
+│   ├── useStockData.js           ✅ P2
+│   ├── useNews.js                ✅ P3
+│   ├── useForum.js               ✅ P4
+│   └── useAuth.js                🆕 P5
+└── lib/
+    ├── formatters.js             ✅ P1
+    ├── chartHelpers.js           ✅ P2
+    ├── newsHelpers.js            ✅ P3
+    ├── forumHelpers.js           ✅ P4
+    └── authHelpers.js            🆕 P5
