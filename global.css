@@ -1,27 +1,16 @@
-/* frontend/styles/globals.css */
-
-/* ─── FONTS ────────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
-/* ─── DESIGN TOKENS ─────────────────────────────────────────────── */
 :root {
-  /* Backgrounds */
   --bg-primary:    #080c10;
   --bg-secondary:  #0d1117;
   --bg-tertiary:   #161b22;
   --bg-card:       #0f1923;
   --bg-hover:      #1a2332;
-
-  /* Borders */
   --border:        #1e2d3d;
   --border-accent: #2d4a6e;
-
-  /* Text */
   --text-primary:   #e8edf3;
   --text-secondary: #8b9ab0;
   --text-muted:     #4a5a6e;
-
-  /* Accent Colors */
   --green:       #00d68f;
   --green-dim:   rgba(0,214,143,0.08);
   --green-border:rgba(0,214,143,0.2);
@@ -33,13 +22,9 @@
   --amber:       #f59e0b;
   --amber-dim:   rgba(245,158,11,0.08);
   --cyan:        #06b6d4;
-
-  /* Typography */
   --font-display: 'Syne', sans-serif;
   --font-mono:    'IBM Plex Mono', monospace;
   --font-body:    'DM Sans', sans-serif;
-
-  /* Layout */
   --sidebar-w:  220px;
   --topbar-h:   48px;
   --ticker-h:   40px;
@@ -50,7 +35,6 @@
   --radius-xl:  12px;
 }
 
-/* ─── RESET ─────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -66,25 +50,19 @@ a { color: inherit; text-decoration: none; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 input, textarea { font-family: inherit; }
 
-/* ─── SCROLLBAR ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 
-/* ─── TYPOGRAPHY UTILITIES ──────────────────────────────────────── */
 .font-display { font-family: var(--font-display); }
-.font-mono    { font-family: var(--font-mono); }
+.font-mono, .mono { font-family: var(--font-mono); }
 .text-primary   { color: var(--text-primary); }
 .text-secondary { color: var(--text-secondary); }
 .text-muted     { color: var(--text-muted); }
-.up   { color: var(--green); }
-.down { color: var(--red);   }
-.positive { color: var(--green); }
-.negative { color: var(--red);   }
-.mono { font-family: var(--font-mono); }
+.up, .positive  { color: var(--green); }
+.down, .negative { color: var(--red); }
 
-/* ─── PAGE LAYOUT ───────────────────────────────────────────────── */
 .app-wrapper {
   display: flex;
   flex-direction: column;
@@ -104,7 +82,6 @@ input, textarea { font-family: inherit; }
   transition: margin 0.2s ease;
 }
 
-/* ─── MARKET TICKER ─────────────────────────────────────────────── */
 .ticker-bar {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
@@ -162,7 +139,6 @@ input, textarea { font-family: inherit; }
 .ticker-chg.up   { color: var(--green); background: var(--green-dim); }
 .ticker-chg.down { color: var(--red);   background: var(--red-dim);   }
 
-/* ─── TOP NAV ───────────────────────────────────────────────────── */
 .topnav {
   position: fixed;
   top: var(--ticker-h);
@@ -197,10 +173,9 @@ input, textarea { font-family: inherit; }
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(0.7); }
+  50%      { opacity: 0.5; transform: scale(0.7); }
 }
 
-/* ─── SIDEBAR ───────────────────────────────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--bg-secondary);
@@ -266,7 +241,6 @@ input, textarea { font-family: inherit; }
 .watchlist-pct   { font-family: var(--font-mono); font-size: 9px; text-align: right; }
 .add-watchlist-btn { font-size: 11px; color: var(--blue); padding: 6px 10px; }
 
-/* ─── RIGHT PANEL ───────────────────────────────────────────────── */
 .right-panel {
   width: var(--right-w);
   background: var(--bg-secondary);
@@ -278,7 +252,6 @@ input, textarea { font-family: inherit; }
   padding: 16px;
 }
 
-/* ─── DASHBOARD ─────────────────────────────────────────────────── */
 .page-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 20px;
@@ -293,7 +266,6 @@ input, textarea { font-family: inherit; }
 .market-status.open   { color: var(--green); }
 .market-status.closed { color: var(--red);   }
 
-/* ─── INDEX CARDS ───────────────────────────────────────────────── */
 .index-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -324,7 +296,6 @@ input, textarea { font-family: inherit; }
 .index-chg   { font-family: var(--font-mono); font-size: 11px; font-weight: 500; }
 .sparkline   { margin-top: 8px; height: 32px; }
 
-/* ─── SECTION HEADERS ───────────────────────────────────────────── */
 .section-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px;
@@ -344,7 +315,6 @@ input, textarea { font-family: inherit; }
 .section-dot.green { background: var(--green); }
 .section-link { font-size: 11px; color: var(--blue); cursor: pointer; }
 
-/* ─── STOCK ROWS ─────────────────────────────────────────────────── */
 .stock-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
@@ -366,7 +336,6 @@ input, textarea { font-family: inherit; }
 .stock-pct.up   { color: var(--green); background: var(--green-dim); }
 .stock-pct.down { color: var(--red);   background: var(--red-dim);   }
 
-/* ─── COMPANY ANALYTICS ─────────────────────────────────────────── */
 .screener-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -394,7 +363,6 @@ input, textarea { font-family: inherit; }
 .screener-key { color: var(--text-secondary); }
 .screener-val { font-family: var(--font-mono); font-weight: 500; }
 
-/* Quarterly table */
 .quarterly-strip {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -412,13 +380,11 @@ input, textarea { font-family: inherit; }
 .q-period { font-family: var(--font-mono); font-size: 10px; font-weight: 600; padding: 6px 10px; border-bottom: 1px solid var(--border); }
 .q-val { font-family: var(--font-mono); font-size: 11px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
 
-/* Trend cards */
 .metrics-trend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
 .trend-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; }
 .trend-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
 .trend-current { font-family: var(--font-mono); font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 
-/* ─── NEWS ───────────────────────────────────────────────────────── */
 .news-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
 .news-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -441,7 +407,6 @@ input, textarea { font-family: inherit; }
 .sentiment-pill.neut { color: var(--amber); background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.2); }
 .news-tag { font-family: var(--font-mono); font-size: 9px; padding: 1px 6px; border-radius: 3px; background: var(--bg-tertiary); color: var(--text-muted); border: 1px solid var(--border); }
 
-/* ─── BADGES & PILLS ─────────────────────────────────────────────── */
 .live-badge {
   display: inline-flex; align-items: center; gap: 5px;
   font-family: var(--font-mono); font-size: 9px; font-weight: 600;
@@ -455,13 +420,11 @@ input, textarea { font-family: inherit; }
 }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* ─── ANIMATIONS ─────────────────────────────────────────────────── */
 @keyframes flash-green { from { background: var(--green-dim); } to { background: transparent; } }
 @keyframes flash-red   { from { background: var(--red-dim);   } to { background: transparent; } }
 .flash-green { animation: flash-green 0.6s ease; }
 .flash-red   { animation: flash-red   0.6s ease; }
 
-/* ─── RESPONSIVE ─────────────────────────────────────────────────── */
 @media (max-width: 1200px) {
   .right-panel { display: none; }
   .main-content { margin-right: 0 !important; }
@@ -473,8 +436,6 @@ input, textarea { font-family: inherit; }
   :root { --sidebar-w: 0px; }
   .sidebar { display: none; }
   .main-content { margin-left: 0 !important; padding: 12px; }
-  .index-grid { grid-template-columns: repeat(2, 1fr); }
   .news-grid { grid-template-columns: 1fr; }
   .screener-grid { grid-template-columns: 1fr; }
-  .metrics-trend { grid-template-columns: repeat(2, 1fr); }
 }
