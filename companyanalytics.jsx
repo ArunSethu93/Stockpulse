@@ -3,16 +3,7 @@
 
 import { useState, useEffect } from 'react';
 
-/**
- * CompanyAnalytics — Screener.in-style financial analytics panel
- *
- * Data Strategy:
- * 1. Primary: Our backend scrapes & caches NSE/BSE official data
- * 2. Supplementary: We call our /api/analytics/:symbol endpoint
- *    which aggregates from multiple open sources (NSE API, BSE XML feeds,
- *    Yahoo Finance unofficial JSON endpoint, Tickertape public data)
- * 3. Display computed ratios alongside raw financials
- */
+
 
 const METRIC_GROUPS = [
   {
