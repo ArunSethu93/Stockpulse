@@ -131,7 +131,6 @@ export default function CandlestickChart({ symbol, initialData = [] }) {
       scaleMargins:  { top: 0.8, bottom: 0 },
     });
 
-    // ── Crosshair subscriber ──
     chart.subscribeCrosshairMove(param => {
       if (param.time && param.seriesPrices) {
         const price = param.seriesPrices.get(candleSeries);
