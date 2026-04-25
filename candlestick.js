@@ -5,17 +5,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { createChart, CrosshairMode, LineStyle } from 'lightweight-charts';
 import { usePriceStream } from '../../hooks/useWebSocket';
 
-/**
- * CandlestickChart — TradingView Lightweight Charts integration
- *
- * Features:
- * - OHLCV candlestick rendering (real-time streaming)
- * - Overlay: EMA 20, EMA 50, Bollinger Bands
- * - Sub-panes: Volume, RSI, MACD
- * - Crosshair with tooltip
- * - Timeframe switching with SWR data fetching
- * - Auto-resizes with ResizeObserver
- */
 
 const THEME = {
   bg:          '#0f1923',
